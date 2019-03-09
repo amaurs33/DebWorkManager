@@ -65,7 +65,7 @@ def win_route() :
 
 	buttonEnregistrer=Button(frame_up,command=route)
 	buttonEnregistrer.grid(row=1,column=7)
-	buttonAddImg = PhotoImage(file="buttonAdd2.gif")
+	buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
 	buttonEnregistrer.config(image=buttonAddImg)
 	buttonEnregistrer.image = buttonAddImg
 
@@ -75,7 +75,7 @@ def win_route() :
 
 	buttonDelete=Button(frame_up,command=route)
 	buttonDelete.grid(row=1,column=9)
-	deleteImg = PhotoImage(file="minus.gif")
+	deleteImg = PhotoImage(file="pictures/minus.gif")
 	buttonDelete.config(image=deleteImg)
 	buttonDelete.image = deleteImg
 
@@ -121,7 +121,7 @@ def win_log() :
 
 	buttonEnregistrer=Button(frame_up)
 	buttonEnregistrer.grid(row=1,column=6)
-	buttonAddImg = PhotoImage(file="buttonAdd2.gif")
+	buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
 	buttonEnregistrer.config(image=buttonAddImg)
 	buttonEnregistrer.image = buttonAddImg
 
@@ -148,7 +148,7 @@ def win_log() :
 
 	buttonAfficher=Button(frame_up, command=log)
 	buttonAfficher.grid(row=2,column=2)
-	afficherImg = PhotoImage(file="afficher.gif")
+	afficherImg = PhotoImage(file="pictures/afficher.gif")
 	buttonAfficher.config(image=afficherImg)
 	buttonAfficher.image = afficherImg
 
@@ -185,7 +185,7 @@ def win_iptable() :
 
 	buttonINPUT=Button(frame_up)
 	buttonINPUT.grid(row=0,column=5)
-	buttonAddImg = PhotoImage(file="INPUT.gif")
+	buttonAddImg = PhotoImage(file="pictures/INPUT.gif")
 	buttonINPUT.config(image=buttonAddImg)
 	buttonINPUT.image = buttonAddImg
 
@@ -194,7 +194,7 @@ def win_iptable() :
 
 	buttonOUTPUT=Button(frame_up)
 	buttonOUTPUT.grid(row=0,column=7)
-	buttonAddImg1 = PhotoImage(file="OUTPUT.gif")
+	buttonAddImg1 = PhotoImage(file="pictures/OUTPUT.gif")
 	buttonOUTPUT.config(image=buttonAddImg1)
 	buttonOUTPUT.image = buttonAddImg1
 
@@ -239,7 +239,7 @@ def win_iptable() :
 
 	buttonACCEPT=Button(frame_up)
 	buttonACCEPT.grid(row=0,column=17)
-	buttonAddImg2 = PhotoImage(file="accept.gif")
+	buttonAddImg2 = PhotoImage(file="pictures/accept.gif")
 	buttonACCEPT.config(image=buttonAddImg2)
 	buttonACCEPT.image = buttonAddImg2
 
@@ -248,7 +248,7 @@ def win_iptable() :
 
 	buttonDROP=Button(frame_up)
 	buttonDROP.grid(row=0,column=19)
-	buttonAddImg3 = PhotoImage(file="DROP.gif")
+	buttonAddImg3 = PhotoImage(file="pictures/DROP.gif")
 	buttonDROP.config(image=buttonAddImg3)
 	buttonDROP.image = buttonAddImg3
 	
@@ -257,7 +257,7 @@ def win_iptable() :
 
 	buttonREJECT=Button(frame_up)
 	buttonREJECT.grid(row=0,column=21)
-	buttonAddImg4 = PhotoImage(file="reject.gif")
+	buttonAddImg4 = PhotoImage(file="pictures/reject.gif")
 	buttonREJECT.config(image=buttonAddImg4)
 	buttonREJECT.image = buttonAddImg4
 
@@ -266,7 +266,7 @@ def win_iptable() :
 	
 	buttonEnregistrer=Button(frame_up)
 	buttonEnregistrer.grid(row=0,column=23)
-	buttonAddImg = PhotoImage(file="buttonAdd2.gif")
+	buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
 	buttonEnregistrer.config(image=buttonAddImg)
 	buttonEnregistrer.image = buttonAddImg
 
@@ -302,7 +302,7 @@ labelVide2 = Label(window,text="  ",bg='#ffffff')
 labelVide2.grid(row=0,column=0)
 
 buttonRoute =Button(window,command =win_route)
-routeImg = PhotoImage(file="road.gif")
+routeImg = PhotoImage(file="pictures/road.gif")
 buttonRoute.config(image=routeImg)
 buttonRoute.image = routeImg
 buttonRoute.grid(row=1,column=0)
@@ -311,7 +311,7 @@ labelVide = Label(window,text="  ",bg='#ffffff')
 labelVide.grid(row=1,column=1)
 
 buttonIptable =Button(window, command =win_iptable)
-firewallImg = PhotoImage(file="firewall.gif")
+firewallImg = PhotoImage(file="pictures/firewall.gif")
 buttonIptable.config(image=firewallImg)
 buttonIptable.image = firewallImg
 buttonIptable.grid(row=1,column=2)
@@ -320,7 +320,7 @@ labelVide1 = Label(window,text="  ",bg='#ffffff')
 labelVide1.grid(row=1,column=3)
 
 buttonLog =Button(window, command =win_log)
-logImg = PhotoImage(file="log.gif")
+logImg = PhotoImage(file="pictures/log.gif")
 buttonLog.config(image=logImg)
 buttonLog.image = logImg
 buttonLog.grid(row=1,column=4)
@@ -329,7 +329,7 @@ labelVide2 = Label(window,text="  ",bg='#ffffff')
 labelVide2.grid(row=1,column=5)
 
 buttonAide =Button(window, command =odt)
-aideImg = PhotoImage(file="aide.gif")
+aideImg = PhotoImage(file="pictures/aide.gif")
 buttonAide.config(image=aideImg)
 buttonAide.image = aideImg
 buttonAide.grid(row=1,column=6)
