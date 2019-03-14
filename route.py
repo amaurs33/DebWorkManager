@@ -2,24 +2,50 @@
 # -*- coding: latin-1 -*-
 from Tkinter import *
 import subprocess
+import tkMessageBox
+import time
+import os
 
+####################################### Fenêtre demande de MDP #######################################
+
+def sudo () :
+	
+	def variable () :
+		sudo_password.set(entryPort.get()) 
+		
+	sudo = Toplevel(newwin)
+	sudo.lift(aboveThis=newwin)
+	entryPort = Entry(sudo)
+	entryPort.grid(row=0,column=0)
+	buttonEnregistrer=Button(sudo,command=variable)
+	buttonEnregistrer.grid(row=1,column=0)
+	
 
 ############################################ definition des fonctions ####################################
 	
-def route() :
+def route() : # exécution de la commande : route -n afin d'afficher les routes définient
 
-	routePrint = subprocess.Popen(["route","-n"], stdout=subprocess.PIPE)
+	routePrint = subprocess.Popen(["sudo","route","-n"], stdout=subprocess.PIPE)
 	output = routePrint.communicate()[0]
-	#print(output)
 	route_label.set(output)
 	
-	#route_label.set(output)
+def root_login():
 
+
+	command = 'sudo apt-get update'
+	command = command.split()
+
+	cmd1 = subprocess.Popen(['echo',sudo_password.get()], stdout=subprocess.PIPE)
+	cmd2 = subprocess.Popen(['sudo','-S'] + command, stdin=cmd1.stdout, stdout=subprocess.PIPE)
+	output = cmd2.stdout.read().decode() 
+	
 
 ####################################### Fenêtre secondaire route #######################################
 
 newwin = Tk()
-	
+sudo_password = StringVar()
+sudo()
+
 ### mise en forme de la fenêtre principale ###
 
 frame_down = Frame (newwin,height=200,width=800,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
@@ -57,7 +83,7 @@ entryMasque.grid(row=1,column=5)
 labelVide = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
 labelVide.grid(row=1,column=6)
 
-buttonEnregistrer=Button(frame_up,command=route)
+buttonEnregistrer=Button(frame_up,command=root_login)
 buttonEnregistrer.grid(row=1,column=7) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
 buttonEnregistrer.config(image=buttonAddImg)
@@ -72,7 +98,7 @@ deleteImg = PhotoImage(file="pictures/minus.gif")
 buttonDelete.config(image=deleteImg)
 buttonDelete.image = deleteImg
 
-##################################### partie inférieure frame_up #######################################
+##################################### partie inférieure frame_down #######################################
 	
 labelDown = Label(frame_down,textvariable=route_label)
 labelDown.place(x=150,y=10)
