@@ -1,4 +1,4 @@
-#! /bin/sh
+﻿#! /bin/sh
 ### BEGIN INIT INFO
 # Provides: route.sh
 # Required-Start:
@@ -8,3 +8,11 @@
 # Short-Description: Start daemon at boot time
 # Description: Enable service provided by daemon
 ### END INIT INFO
+
+
+
+
+
+
+
+route add -net  netmask  gw 

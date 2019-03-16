@@ -38,13 +38,13 @@ window = Tk()
 ### mise en forme de la fenêtre principale ###
 
 window.title("Grub") # définition du titre de la fenêtre
-window.geometry("465x140") # définition de la taille de la fenêtre
-window.configure(bg='#ffffff') # définition de la couleur de fond de la fenêtre
+window.geometry("465x230") # définition de la taille de la fenêtre
+window.configure(bg='#000000') # définition de la couleur de fond de la fenêtre
 window.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
 
 #*********************************** mise en place du bouton de configuration des routes ****************************#
 
-labelVide2 = Label(window,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les boutons
+labelVide2 = Label(window,text="  ",bg='#000000') # Ces deux lignes permettent juste d'espacer les boutons
 labelVide2.grid(row=0,column=0)
 
 buttonRoute =Button(window,command =route) # Lorsque l'utilisateur va cliquer sur le bouton il va "lancer" la fonction route
@@ -53,7 +53,7 @@ buttonRoute.config(image=routeImg)
 buttonRoute.image = routeImg
 buttonRoute.grid(row=1,column=0)
 
-labelVide = Label(window,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les boutons
+labelVide = Label(window,text="  ",bg='#000000') # Ces deux lignes permettent juste d'espacer les boutons
 labelVide.grid(row=1,column=1)
 
 #******************************** mise en place du bouton de configuration des régles iptable ************************#
@@ -64,7 +64,7 @@ buttonIptable.config(image=firewallImg)
 buttonIptable.image = firewallImg
 buttonIptable.grid(row=1,column=2)
 
-labelVide1 = Label(window,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les boutons
+labelVide1 = Label(window,text="  ",bg='#000000') # Ces deux lignes permettent juste d'espacer les boutons
 labelVide1.grid(row=1,column=3)
 
 #*********************************** mise en place du bouton de configuration des logs ********************************#
@@ -75,7 +75,7 @@ buttonLog.config(image=logImg)
 buttonLog.image = logImg
 buttonLog.grid(row=1,column=4)
 
-labelVide2 = Label(window,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les boutons
+labelVide2 = Label(window,text="  ",bg='#000000') # Ces deux lignes permettent juste d'espacer les boutons
 labelVide2.grid(row=1,column=5)
 
 #******************************* mise en place du bouton d'affichage de la documentation'*******************************#
@@ -86,6 +86,11 @@ buttonAide.config(image=aideImg)
 buttonAide.image = aideImg
 buttonAide.grid(row=1,column=6)
 
+buttonDeployer =Button(window, command =odt) # Lorsque l'utilisateur va cliquer sur le bouton il va "lancer" la fonction odt
+deployerImg = PhotoImage(file="pictures/deployer.gif") # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+buttonDeployer.config(image=deployerImg)
+buttonDeployer.image = deployerImg
+buttonDeployer.place(x=130,y=135)
 
 window.mainloop()
 

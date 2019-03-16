@@ -2,27 +2,76 @@
 # -*- coding: latin-1 -
 from Tkinter import *
 import subprocess
+import tkMessageBox
+import ttk
 
 ############################################ definition des fonctions ####################################
+def ouvertureScript():
 
+	odtPrint = subprocess.Popen(["loffice","scripts/iptable_init.sh"], stdout=subprocess.PIPE)
+	output = odtPrint.communicate()[0]
+	print(output)		
+def sudo():	
 
+	def closeWindow():
+
+		sudoWindow.destroy()
+
+	def variable():
+
+		sudo_password.set(saisie.get())
+		affichageReglesIptable()
+		closeWindow()
+	
+	sudoWindow = Toplevel(win_iptable)
+	sudoWindow.title("Authentification sudo")
+	sudoWindow.lift(aboveThis=win_iptable)
+	labelVide2 = Label(sudoWindow,text="veuillez saisir le mot de passe root :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+	labelVide2.grid(row=0,column=0)
+	entryPort = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
+	entryPort.grid(row=1,column=0)
+	buttonEnregistrer=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
+	buttonEnregistrer.grid(row=2,column=0)
+
+def affichageReglesIptable():
+	
+	
+	command = "sudo iptables -L -n"
+	command = command.split()
+	
+	cmd1 = subprocess.Popen(['echo',sudo_password.get()], stdout=subprocess.PIPE)
+	cmd2 = subprocess.Popen(['sudo','-S'] + command, stdin=cmd1.stdout, stdout=subprocess.PIPE)
+	output,error = cmd2.communicate()
+	#output,error = cmd2.communicate() # Le paragraphe (if else) permet d'afficher des messagesBox en cas de bon ou mauvais mot de passe
+
+	if output:
+		sudo_password.set("")
+		iptableResult.set(output)
+	 	
+	else:
+		sudo_password.set("")
+		tkMessageBox.showerror("Erreur","Mot de passe incorrect")
+		
 ####################################### Fenêtre secondaire iptable #######################################
 
 win_iptable = Tk()
 
 ### mise en forme de la fenêtre principale ###
 
-frame_down = Frame (win_iptable,height=800,width=1000,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
+frame_down = Frame (win_iptable,height=650,width=1000,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
 frame_up = Frame (win_iptable,height=800,width=1000,bd=8,bg="white")
 frame_down.grid(row=1,column=0) # Placement des fenêtres
 frame_up.grid(row=0,column=0) # Placement des fenêtres
 win_iptable.title("Configuration des régles iptables") # définition du titre de la fenêtre
 win_iptable.configure(bg='#ffffff') # définition de la couleur de fond de la fenêtre
-win_iptable.geometry("1000x850") # définition de la taille de la fenêtre
+win_iptable.geometry("1000x700") # définition de la taille de la fenêtre
 win_iptable.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
 
 # définition des variables
 iptableResult = StringVar()
+affichage_label = StringVar()
+sudo_password = StringVar()
+saisie = StringVar()
 
 ##################################### création des boutons,label etc... ###############################
 ##################################### partie supérieur frame_up #######################################
@@ -121,6 +170,7 @@ buttonREJECT.image = buttonAddImg4
 labelName4 = Label(frame_up, text="         ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
 labelName4.grid(row=0,column=22)
 
+
 buttonEnregistrer=Button(frame_up)
 buttonEnregistrer.grid(row=0,column=23) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
@@ -134,7 +184,13 @@ labelDown.place(x=150,y=10)
 labelDown.configure(foreground="white",bg='#000000')
 iptableResult.set("")
 
-buttonActualiser=Button(frame_down, text="Actualiser", foreground = "black")#, command=route)
+buttonFichier=Button(frame_down,command=ouvertureScript)
+buttonFichier.place(x=0,y=0) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+fichierImg = PhotoImage(file="pictures/fichier.gif")
+buttonFichier.config(image=fichierImg)
+buttonFichier.image = fichierImg
+
+buttonActualiser=Button(frame_down, text="Actualiser", foreground = "black", command=sudo)#, command=route)
 buttonActualiser.place(x=890,y=0)
 
 
