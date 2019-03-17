@@ -8,3 +8,6 @@
 # Short-Description: Start daemon at boot time
 # Description: Enable service provided by daemon
 ### END INIT INFO
+
+iptables -A OUTPUTqsdqsdqsdqsd-j DROP-j REJECT-j ACCEPT
+iptables -A INPUTeth0-p 34-j ACCEPT
