@@ -48,7 +48,7 @@ sudo()
 
 ### mise en forme de la fenêtre principale ###
 
-frame_down = Frame (newwin,height=200,width=800,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
+frame_down = Frame (newwin,height=400,width=800,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
 frame_up = Frame (newwin,height=400,width=800,bd=8,bg="white")
 frame_down.grid(row=1,column=0) # Placement des fenêtres
 frame_up.grid(row=0,column=0) # Placement des fenêtres

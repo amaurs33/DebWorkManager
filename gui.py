@@ -7,6 +7,10 @@ import subprocess
 
 
 ############################################ definition des fonctions ####################################
+## fonction qui va afficher la fenêtre de configuration des routes ##
+
+def deploiement_def():
+	os.system('python scripts/deploiement.py') # On appelle le script python route.py
 
 ## fonction qui va afficher la fenêtre de configuration des routes ##
 
@@ -38,7 +42,7 @@ window = Tk()
 ### mise en forme de la fenêtre principale ###
 
 window.title("Grub") # définition du titre de la fenêtre
-window.geometry("465x230") # définition de la taille de la fenêtre
+window.geometry("465x220") # définition de la taille de la fenêtre
 window.configure(bg='#000000') # définition de la couleur de fond de la fenêtre
 window.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
 
@@ -86,11 +90,11 @@ buttonAide.config(image=aideImg)
 buttonAide.image = aideImg
 buttonAide.grid(row=1,column=6)
 
-buttonDeployer =Button(window, command =odt) # Lorsque l'utilisateur va cliquer sur le bouton il va "lancer" la fonction odt
+buttonDeployer =Button(window, command =deploiement_def) # Lorsque l'utilisateur va cliquer sur le bouton il va "lancer" la fonction odt
 deployerImg = PhotoImage(file="pictures/deployer.gif") # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 buttonDeployer.config(image=deployerImg)
 buttonDeployer.image = deployerImg
-buttonDeployer.place(x=130,y=135)
+buttonDeployer.place(x=135,y=135)
 
 window.mainloop()
 

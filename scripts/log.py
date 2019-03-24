@@ -43,6 +43,9 @@ def ajoutDB ():
 	connexion.commit()
 	tkMessageBox.showinfo("Réussite", "Opération effectuée")
 	connexion.close()
+	nouveau_chemin_log.set("")
+	nom_chemin_log.set("")
+	integrationListbox()
 
 
 
@@ -117,7 +120,6 @@ buttonEnregistrer.image = buttonAddImg
 
 labelName = Label(frame_up, text="Sélectionnez un Log:", foreground='white',bg='#6a8bff')
 labelName.grid(row=2,column=0)
-
 
 
 buttonAfficher=Button(frame_up, command=recuperationCheminDB)
