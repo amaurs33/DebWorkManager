@@ -7,7 +7,7 @@ import subprocess
 
 
 ############################################ definition des fonctions ####################################
-## fonction qui va afficher la fenêtre de configuration des routes ##
+## fonction qui va afficher la fenêtre de déploiement ##
 
 def deploiement_def():
 	os.system('python scripts/deploiement.py') # On appelle le script python route.py

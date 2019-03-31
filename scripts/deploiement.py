@@ -5,16 +5,61 @@ import subprocess
 import tkMessageBox
 import ttk
 import sqlite3
+import sys
+import os
 
 
 ############################################ definition des fonctions ####################################
-def deployer():
-	commande_1 = "scp -r scripts/iptable_init.sh root@"+cheminLog.get()+":etc/init.d/ "
-	commande_2 = "&& scp -r scripts/route_init.sh root@"+cheminLog.get()+":etc/init.d/ "
-	commande_3 = "ssh root@machine_distante 'update-rc.d /etc/init.d/iptable_init.sh defaults && update-rc.d /etc/init.d/route_init.sh defaults'"
+def sudo():	
 
-	connexion_ssh = subprocess.Popen([commande_1,commande_2,commande_3], stdout=subprocess.PIPE)
+	def closeWindow():
+
+		sudoWindow.quit()
+
+	def variable():
+
+		sudo_password.set(saisie.get())
+		
+		closeWindow()
+		deployer()
+	
+	sudoWindow = Toplevel(winlog)
+	sudoWindow.title("Authentification sudo")
+	sudoWindow.lift(aboveThis=winlog)
+	labelVide2 = Label(sudoWindow,text="veuillez saisir le mot de passe root :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+	labelVide2.grid(row=0,column=0)
+	entryPort = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
+	entryPort.grid(row=1,column=0)
+	buttonEnregistrer=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
+	buttonEnregistrer.grid(row=2,column=0)
+
+def chemin_script() : # exécution de la commande : route -n afin d'afficher les routes définient
+
+	#cheminIptable = subprocess.Popen(["locate","iptable_init.sh"], stdout=subprocess.PIPE)
+	#outputIptable = cheminIptable.communicate()[0]
+	#iptable_label.set(outputIptable)
+	#print iptable_label.get()
+	commandetest = os.popen("locate","iptable_init.sh").read()
+	print commandetest
+	iptable_label.set(commandetest) 
+	print iptable_label.get()
+
+	cheminRoute = subprocess.Popen(["locate","route_init.sh"], stdout=subprocess.PIPE)
+	outputRoute = cheminRoute.communicate()[0]
+	route_label.set(outputRoute)
+	
+
+def deployer():
+	sudo()
+	chemin_script()
+	commande_1 = "sshpass -p "+ sudo_password.get() +" scp -r "+ iptable_label.get() +" root@"+cheminLog.get()+":/etc/init.d/ && sshpass -p "+sudo_password.get()+" scp -r "+iptable_label.get()+" root@"+cheminLog.get()+":/etc/init.d/ "
+	#commande_2 = "&& scp -r /scripts/route_init.sh root@"+cheminLog.get()+":/etc/init.d/ "
+	#commande_2 = "&& sshpass -p "+sudo_password.get()+" ssh root@"+cheminLog.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'"
+	print commande_1
+	
+	connexion_ssh = subprocess.Popen([commande_1],shell=True, stdout=subprocess.PIPE)
 	output = connexion_ssh.communicate()[0]
+	sudo_password.set('')
 
 def recuperationCheminDB() :
 
@@ -25,8 +70,8 @@ def recuperationCheminDB() :
 	record = curseur.fetchone()
 	cheminLog.set(record[0]) 
 	connexion.close()
-	deployer()
-
+	#deployer()
+	sudo()
 def creationBD () :
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
@@ -77,7 +122,12 @@ adress_ip.set('')
 log_label = StringVar()
 nom_user = StringVar()
 nom_user.set('')
-
+saisie = StringVar()
+sudo_password = StringVar()
+route_label = StringVar()
+route_label.set('')
+iptable_label = StringVar()
+iptable_label.set('')
 cheminLog = StringVar()
 cheminLog.set('')
 
