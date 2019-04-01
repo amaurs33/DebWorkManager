@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pythconcatenation_finalon
 # -*- coding: latin-1 -*-
 from Tkinter import *
 import os

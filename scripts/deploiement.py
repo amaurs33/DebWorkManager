@@ -9,6 +9,7 @@ import sys
 import os
 
 
+
 ############################################ definition des fonctions ####################################
 def sudo():	
 
@@ -35,14 +36,9 @@ def sudo():
 
 def chemin_script() : # exécution de la commande : route -n afin d'afficher les routes définient
 
-	#cheminIptable = subprocess.Popen(["locate","iptable_init.sh"], stdout=subprocess.PIPE)
-	#outputIptable = cheminIptable.communicate()[0]
-	#iptable_label.set(outputIptable)
-	#print iptable_label.get()
-	commandetest = os.popen("locate","iptable_init.sh").read()
-	print commandetest
-	iptable_label.set(commandetest) 
-	print iptable_label.get()
+	cheminIptable = subprocess.Popen(["locate","iptable_init.sh"], stdout=subprocess.PIPE)
+	outputIptable = cheminIptable.communicate()[0]
+	iptable_label.set(outputIptable)
 
 	cheminRoute = subprocess.Popen(["locate","route_init.sh"], stdout=subprocess.PIPE)
 	outputRoute = cheminRoute.communicate()[0]
@@ -50,16 +46,16 @@ def chemin_script() : # exécution de la commande : route -n afin d'afficher les
 	
 
 def deployer():
+
 	sudo()
 	chemin_script()
-	commande_1 = "sshpass -p "+ sudo_password.get() +" scp -r "+ iptable_label.get() +" root@"+cheminLog.get()+":/etc/init.d/ && sshpass -p "+sudo_password.get()+" scp -r "+iptable_label.get()+" root@"+cheminLog.get()+":/etc/init.d/ "
-	#commande_2 = "&& scp -r /scripts/route_init.sh root@"+cheminLog.get()+":/etc/init.d/ "
-	#commande_2 = "&& sshpass -p "+sudo_password.get()+" ssh root@"+cheminLog.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'"
-	print commande_1
+	commande_1 =  "sshpass -p "+ sudo_password.get() +" scp -r scripts/iptable_init.sh root@"+cheminLog.get()+":/etc/init.d/ && sshpass -p "+sudo_password.get()+" scp -r scripts/route_init.sh root@"+cheminLog.get()+":/etc/init.d/ "
+	commande_2 = "&& sshpass -p "+sudo_password.get()+" ssh root@"+cheminLog.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'"
 	
-	connexion_ssh = subprocess.Popen([commande_1],shell=True, stdout=subprocess.PIPE)
+	connexion_ssh = subprocess.Popen([commande_1,commande_2],shell=True, stdout=subprocess.PIPE)
 	output = connexion_ssh.communicate()[0]
 	sudo_password.set('')
+	tkMessageBox.showinfo("Réussite", "Opération effectuée")
 
 def recuperationCheminDB() :
 
@@ -70,8 +66,8 @@ def recuperationCheminDB() :
 	record = curseur.fetchone()
 	cheminLog.set(record[0]) 
 	connexion.close()
-	#deployer()
 	sudo()
+	
 def creationBD () :
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
@@ -130,6 +126,7 @@ iptable_label = StringVar()
 iptable_label.set('')
 cheminLog = StringVar()
 cheminLog.set('')
+concatenation_final = StringVar()
 
 ### création de la listbox pour choisir le log à afficher ###
 
