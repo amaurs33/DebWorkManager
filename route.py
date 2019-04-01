@@ -5,23 +5,22 @@ import subprocess
 import tkMessageBox
 import time
 import os
+############################################ definition des fonctions ####################################
 
-####################################### Fenêtre demande de MDP #######################################
 
-def sudo () :
+
+def sudo () : # Fenêtre de demande de mot de passe
 	
 	def variable () :
-		sudo_password.set(entryPort.get()) 
+		sudo_password.set(entryPort.get()) # On inscrit le mot de passe dans le stringVar sudo_password
 		
-	sudo = Toplevel(newwin)
+	sudo = Toplevel(newwin) # Composition graphique de la fenêtre
 	sudo.lift(aboveThis=newwin)
 	entryPort = Entry(sudo)
 	entryPort.grid(row=0,column=0)
 	buttonEnregistrer=Button(sudo,command=variable)
 	buttonEnregistrer.grid(row=1,column=0)
 	
-
-############################################ definition des fonctions ####################################
 	
 def route() : # exécution de la commande : route -n afin d'afficher les routes définient
 

@@ -5,174 +5,151 @@ import subprocess
 import tkMessageBox
 import ttk
 import sqlite3
-import sys
 import os
 
+############################################ definition des fonctions #############################################
 
-
-############################################ definition des fonctions ####################################
-def sudo():	
+def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
 
 	def closeWindow():
 
-		sudoWindow.quit()
+		SSHpasswdWindows.quit() # Fermeture de la fenêtre de mot de passe SSH
 
-	def variable():
+	def getInputPasswd():
 
-		sudo_password.set(saisie.get())
-		
-		closeWindow()
-		deployer()
+		SSHpasswd.set(readInputSSHPasswd.get()) # On associe la valeur entrée au stringVar SSHpasswd
+		closeWindow() 
+		deployment() # Appelle de la méthode de deploiement
 	
-	sudoWindow = Toplevel(winlog)
-	sudoWindow.title("Authentification sudo")
-	sudoWindow.lift(aboveThis=winlog)
-	labelVide2 = Label(sudoWindow,text="veuillez saisir le mot de passe root :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
-	labelVide2.grid(row=0,column=0)
-	entryPort = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
-	entryPort.grid(row=1,column=0)
-	buttonEnregistrer=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
-	buttonEnregistrer.grid(row=2,column=0)
+	SSHpasswdWindows = Toplevel(windowDeployment) # Composition graphique de la fenêtre
 
-def chemin_script() : # exécution de la commande : route -n afin d'afficher les routes définient
+	SSHpasswdWindows.title("ssh connection authentification")
+	SSHpasswdWindows.lift(aboveThis=windowDeployment)
+	labelSSHPasswd = Label(SSHpasswdWindows,text="Enter SSH password please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+	labelSSHPasswd.grid(row=0,column=0)
+	entrySSHPasswd = Entry(SSHpasswdWindows, bd=5, width=20, show="*",textvariable=readInputSSHPasswd)
+	entrySSHPasswd.grid(row=1,column=0)
+	saveButton=Button(SSHpasswdWindows,command=getInputPasswd, text="Accept", fg="white", bg="#c90000",font='Helvetica 14 bold') # Le bouton enregistré appelle la fonction getInputPasswd qui associe le mot de passe saisi au stringVar SSHpasswd
+	saveButton.grid(row=2,column=0)
 
-	cheminIptable = subprocess.Popen(["locate","iptable_init.sh"], stdout=subprocess.PIPE)
-	outputIptable = cheminIptable.communicate()[0]
-	iptable_label.set(outputIptable)
 
-	cheminRoute = subprocess.Popen(["locate","route_init.sh"], stdout=subprocess.PIPE)
-	outputRoute = cheminRoute.communicate()[0]
-	route_label.set(outputRoute)
+def deployment(): # Fonction qui va déployer les fichier iptable_init.sh et route_init.sh grâce à une connection SSH
+
+	copySSHcommand =  "sshpass -p "+ SSHpasswd.get() +" scp -r scripts/iptable_init.sh root@"+IpSelected.get()+":/etc/init.d/ && sshpass -p "+SSHpasswd.get()+" scp -r scripts/route_init.sh root@"+IpSelected.get()+":/etc/init.d/ " # copie des scripts vers l'ordinateur cible par SSH
+	updateRcSSHCommand = "&& sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'" # Mise à jours,par SSH, du rc.d afin que les scripts s'éxecutent au démarrage.
 	
+	SSHConnection = subprocess.Popen([copySSHcommand,updateRcSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
+	outputSSHConnection = SSHConnection.communicate()[0]
+	SSHpasswd.set('') # Suppression du mot de passe de connection SSH
+	tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
 
-def deployer():
-
-	sudo()
-	chemin_script()
-	commande_1 =  "sshpass -p "+ sudo_password.get() +" scp -r scripts/iptable_init.sh root@"+cheminLog.get()+":/etc/init.d/ && sshpass -p "+sudo_password.get()+" scp -r scripts/route_init.sh root@"+cheminLog.get()+":/etc/init.d/ "
-	commande_2 = "&& sshpass -p "+sudo_password.get()+" ssh root@"+cheminLog.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'"
-	
-	connexion_ssh = subprocess.Popen([commande_1,commande_2],shell=True, stdout=subprocess.PIPE)
-	output = connexion_ssh.communicate()[0]
-	sudo_password.set('')
-	tkMessageBox.showinfo("Réussite", "Opération effectuée")
-
-def recuperationCheminDB() :
+def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données
 
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
-	name = lb.get(lb.curselection())
-	curseur.execute("SELECT IP FROM ip_ssh WHERE USER LIKE '%s'" % name)
+	getUserInListbox = listboxUserToIp.get(listboxUserToIp.curselection())
+	curseur.execute("SELECT IP FROM ip_ssh WHERE USER LIKE '%s'" % getUserInListbox) # Récupération de l'IP suivant l'utilisateur selectionné dans la listbox
 	record = curseur.fetchone()
-	cheminLog.set(record[0]) 
-	connexion.close()
-	sudo()
-	
-def creationBD () :
+	IpSelected.set(record[0]) 
+	connexion.close() # Fermeture de la connexion SSH
+	getSSHPasswd() # Appelle de la fonction getSSHPasswd afin de pouvoir authentifier la connection SSH
+
+def databaseCreationIpUser () : # Création de la base de donnée IP - USER
+
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
 	curseur.execute('''CREATE TABLE IF NOT EXISTS ip_ssh (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, IP TEXT, USER TEXT)''') # création de la table logFiles
-	connexion.close()
+	connexion.close() # Fermeture de la connection
 
-def ajoutDB ():
-	## gestion de la base de donnée ip_ssh.db
+def databaseAdd (): # Ajout de données dans la base de donnée IP - USER
+	
 
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
-	donnees = (adress_ip.get(),nom_user.get())
-	curseur.execute('''INSERT INTO ip_ssh (IP, USER ) VALUES (?,?)''',donnees)
-	connexion.commit()
-	tkMessageBox.showinfo("Réussite", "Opération effectuée")
-	connexion.close()
-	adress_ip.set("")
-	nom_user.set("")
-	integrationListbox()
+	entriesIpUser = (ipAddress.get(),userName.get()) # Récupération des valeurs entrées dans les textBox : IP et USER
+	curseur.execute('''INSERT INTO ip_ssh (IP, USER ) VALUES (?,?)''',entriesIpUser) # Insertion dans la base de donnée
+	connexion.commit() # Fermeture de la connection
+	tkMessageBox.showinfo("Succes", "Opération effectuée")
+	connexion.close() # Fermeture de la connection
+	ipAddress.set("") # Réinitialisation de l'adresse IP
+	userName.set("") # Réinitialisation du nom de l'utilisateur
+	listboxIntegration() # Fonction qui va intégrer les nouvelles valeurs dans la listbox
 
 
-def integrationListbox () :
+def listboxIntegration () : # Fonction qui va intégrer des valeurs dans la listBox
+
 	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
 	curseur.execute("SELECT USER FROM ip_ssh") # Récupération des valeurs "nom" dans la base de donnée pour l'insérer dans la listeBox
 	i=0
 	for row in curseur.fetchall():
-		lb.insert(i,row[0])
+		listboxUserToIp.insert(i,row[0])
 		i=i+1
-	connexion.close()
+	connexion.close() # Fermeture de la base de donnée
 
-####################################### Fenêtre secondaire log #######################################
 
+################################### MAIN #########################################
 		
-winlog = Tk()
-frame_down = Frame (winlog,height=650,width=1000,relief=RAISED,bd=8,bg="white") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
-frame_up = Frame (winlog,height=900,width=1000,bd=8,bg="white")
+windowDeployment = Tk() # Les lignes suivantes définissent l'interface graphique de la fenêtre principale
+frame_down = Frame (windowDeployment,height=650,width=1000,relief=RAISED,bd=8,bg="white") 
+frame_up = Frame (windowDeployment,height=900,width=1000,bd=8,bg="white")
 frame_down.grid(row=1,column=0) # Placement des fenêtres
 frame_up.grid(row=0,column=0) # Placement des fenêtres
-winlog.title("Configurer des routes")
-winlog.configure(bg='#ffffff')
-winlog.geometry("800x130")
-winlog.resizable(width=False,height=False)
+windowDeployment.title("Configurer des routes")
+windowDeployment.configure(bg='#ffffff')
+windowDeployment.geometry("800x130")
+windowDeployment.resizable(width=False,height=False)
 
 ### Définition des variables
-adress_ip = StringVar()
-adress_ip.set('')
-log_label = StringVar()
-nom_user = StringVar()
-nom_user.set('')
-saisie = StringVar()
-sudo_password = StringVar()
-route_label = StringVar()
-route_label.set('')
-iptable_label = StringVar()
-iptable_label.set('')
-cheminLog = StringVar()
-cheminLog.set('')
-concatenation_final = StringVar()
 
-### création de la listbox pour choisir le log à afficher ###
+ipAddress = StringVar() # Variable "adresse IP"
+ipAddress.set('')
+userName = StringVar() # Variable "nom d'utilisateur"
+userName.set('')
+readInputSSHPasswd = StringVar() # Variable d'entrée de mot de passe dans la textbox
+SSHpasswd = StringVar() # Variable de mot de passe SSH
+IpSelected = StringVar() # Variable de l'IP selectionnée dans la listbox par rapport à l'utilisateur
+IpSelected.set('')
 
-lb = Listbox(frame_down, height =2)
-lb.grid(row=2,column=3)
+### Mise en place des éléments dans la fenêtre windows deployment
 
-### gestion de la base de donnée
-creationBD ()
-integrationListbox ()
+labelIpAdd = Label(frame_up, text="Ajouter une adresse IP :", foreground='white',bg='#1d83ff') 
+labelIpAdd.grid(row=1,column=0)
+entryIp = Entry(frame_up,textvariable=ipAddress) # Textbox d'entrée d'adresse IP dans le srtingVar ipAdress
+entryIp.grid(row=1,column=1)
 
-#recuperationCheminDB()
+emptyLabel = Label(frame_up,text="  ",bg='#ffffff') # Label vide pour l'espacement
+emptyLabel.grid(row=1,column=2)
 
-### ajout du label et du textbox
-
-labelLog = Label(frame_up, text="Ajouter une adresse IP :", foreground='white',bg='#1d83ff')
-labelLog.grid(row=1,column=0)
-entryLog = Entry(frame_up,textvariable=adress_ip)
-entryLog.grid(row=1,column=1)
-labelVide = Label(frame_up,text="  ",bg='#ffffff')
-labelVide.grid(row=1,column=2)
-
-labelName = Label(frame_up, text="Associez-lui un nom d'utilisateur :", foreground='white',bg='#1d83ff')
+labelName = Label(frame_up, text="Associez-lui un nom d'utilisateur :", foreground='white',bg='#1d83ff') 
 labelName.grid(row=1,column=3)
-entryName = Entry(frame_up,textvariable=nom_user)
+entryName = Entry(frame_up,textvariable=userName) #Textbox d'entrée du nom d'utilisateur dans le srtingVar userName
 entryName.grid(row=1,column=4)
 
-labelVide = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
-labelVide.grid(row=1,column=5)
+emptyLabel1 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
+emptyLabel1.grid(row=1,column=5)
 
-buttonEnregistrer=Button(frame_up,command=ajoutDB)
-buttonEnregistrer.grid(row=1,column=6)
+saveButton=Button(frame_up,command=databaseAdd) # Bouton d'enregistrement qui va renvoyer vers la méthode databaseAdd
+saveButton.grid(row=1,column=6) # Les lignes suivantes mettent en place l'interface graphique du bouton
 buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
-buttonEnregistrer.config(image=buttonAddImg)
-buttonEnregistrer.image = buttonAddImg
+saveButton.config(image=buttonAddImg)
+saveButton.image = buttonAddImg
 
 labelName = Label(frame_down, text="Sélectionnez un utilisateur:", foreground='white',bg='#6a8bff')
 labelName.grid(row=2,column=2)
 
+listboxUserToIp = Listbox(frame_down, height =2) # création de la listbox pour choisir vers quelle adresse IP/USER la connexion SSH doit être effectuée 
+listboxUserToIp.grid(row=2,column=3)
 
-
-buttonAfficher=Button(frame_down, command=recuperationCheminDB)
-buttonAfficher.grid(row=2,column=4)
+buttonDeployment=Button(frame_down, command=getIpInDatabase) # Bouton de deploiement final en passant par la méthode getIpInDatabase
+buttonDeployment.grid(row=2,column=4)
 afficherImg = PhotoImage(file="pictures/deploiement.gif")
-buttonAfficher.config(image=afficherImg)
-buttonAfficher.image = afficherImg
+buttonDeployment.config(image=afficherImg)
+buttonDeployment.image = afficherImg
 
+### Excecution des méthodes de création de la base de donnée et de mise en place de la listbox suivant la base de donnée
 
+databaseCreationIpUser ()
+listboxIntegration ()
 
-winlog.mainloop()
+windowDeployment.mainloop()
