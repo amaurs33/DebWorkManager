@@ -3,26 +3,25 @@
 from Tkinter import *
 import subprocess
 import tkMessageBox
-import time
+#import time
 import os
+
 ############################################ definition des fonctions ####################################
 
-
-
-def sudo () : # Fenêtre de demande de mot de passe
+def getSudoPasswd () : # Fenêtre de demande de mot de passe
 	
-	def variable () :
-		sudo_password.set(entryPort.get()) # On inscrit le mot de passe dans le stringVar sudo_password
+	def getInputPasswd () :
+		sudo_password.set(entryPasswd.get()) # On inscrit le mot de passe dans le stringVar sudo_password
 		
-	sudo = Toplevel(newwin) # Composition graphique de la fenêtre
-	sudo.lift(aboveThis=newwin)
-	entryPort = Entry(sudo)
-	entryPort.grid(row=0,column=0)
-	buttonEnregistrer=Button(sudo,command=variable)
-	buttonEnregistrer.grid(row=1,column=0)
+	getPasswdWindow = Toplevel(newwin) # Composition graphique de la fenêtre
+	getPasswdWindow.lift(aboveThis=newwin)
+	entryPasswd = Entry(getPasswdWindow)
+	entryPasswd.grid(row=0,column=0)
+	saveButton=Button(getPasswdWindow,command=getInputPasswd)
+	saveButton.grid(row=1,column=0)
 	
 	
-def route() : # exécution de la commande : route -n afin d'afficher les routes définient
+def displayRoad() : # exécution de la commande : route -n afin d'afficher les routes définient
 
 	routePrint = subprocess.Popen(["sudo","route","-n"], stdout=subprocess.PIPE)
 	output = routePrint.communicate()[0]
@@ -43,7 +42,7 @@ def root_login():
 
 newwin = Tk()
 sudo_password = StringVar()
-sudo()
+getSudoPasswd()
 
 ### mise en forme de la fenêtre principale ###
 
@@ -82,16 +81,16 @@ entryMasque.grid(row=1,column=5)
 labelVide = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
 labelVide.grid(row=1,column=6)
 
-buttonEnregistrer=Button(frame_up,command=root_login)
-buttonEnregistrer.grid(row=1,column=7) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+saveButton=Button(frame_up,command=root_login)
+saveButton.grid(row=1,column=7) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
-buttonEnregistrer.config(image=buttonAddImg)
-buttonEnregistrer.image = buttonAddImg
+saveButton.config(image=buttonAddImg)
+saveButton.image = buttonAddImg
 
 labelVide1 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
 labelVide1.grid(row=1,column=8)
 
-buttonDelete=Button(frame_up,command=route)
+buttonDelete=Button(frame_up,command=displayRoad)
 buttonDelete.grid(row=1,column=9) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 deleteImg = PhotoImage(file="pictures/minus.gif")
 buttonDelete.config(image=deleteImg)

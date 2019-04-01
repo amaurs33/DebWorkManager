@@ -11,102 +11,99 @@ import tkMessageBox
 	
 
 
-def inscription_route_script():
+def writeRoadToScript(): # Inscription de la nouvelle route dans le fichier route_init.sh
 
-	phrase.set("route add -net "+addresse.get()+" netmask "+masque.get()+" gw "+passerelle.get())
-	file = open('scripts/route_init.sh','a')
-	file.write("\n"+phrase.get())
-	file.close()	
-	masque.set("") # Les 4 prochaines lignes réinitialisent les variables
-	passerelle.set("")
-	addresse.set("")
-	phrase.set("")
-	tkMessageBox.showinfo("Réussite", "Opération effectuée")
+	newRoad.set("route add -net "+address.get()+" netmask "+mask.get()+" gw "+gateway.get()) # Création du string route
+	file = open('scripts/route_init.sh','a') # Ouverture puis inscription dans le fichier route_init.sh
+	file.write("\n"+newRoad.get())
+	file.close()
+
+	mask.set("") # Les 4 prochaines lignes réinitialisent les variables
+	gateway.set("")
+	address.set("")
+	newRoad.set("")
+
+	tkMessageBox.showinfo("Réussite", "Opération effectuée") # Affichage de la réussite de l'enregistrement
 
 def route() : # exécution de la commande : route -n afin d'afficher les routes définient
 
-	routePrint = subprocess.Popen(["route","-n"], stdout=subprocess.PIPE)
-	output = routePrint.communicate()[0]
-	route_label.set(output)
+	raodDisplayCommandLine = subprocess.Popen(["route","-n"], stdout=subprocess.PIPE) # Exécution de la commande route -n
+	output = raodDisplayCommandLine.communicate()[0]
+	raodLabel.set(output)
 	
-def ouvertureScript():
+def roadScriptOpening(): # Lancement du script de configuration des routes pour une modification en direct
 
 	odtPrint = subprocess.Popen(["loffice","scripts/route_init.sh"], stdout=subprocess.PIPE)
 	output = odtPrint.communicate()[0]
-	print(output)		
+			
+####################################### MAIN #######################################
 
-####################################### Fenêtre secondaire route #######################################
-
-newwin = Tk()
-
-
-### mise en forme de la fenêtre principale ###
-
-frame_down = Frame (newwin,height=200,width=850,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
-frame_up = Frame (newwin,height=400,width=850,bd=8,bg="white")
-frame_down.grid(row=1,column=0) # Placement des fenêtres
-frame_up.grid(row=0,column=0) # Placement des fenêtres
-newwin.title("Configurer des routes") # définition du titre de la fenêtre
-newwin.configure(bg='#ffffff') # définition de la couleur de fond de la fenêtre
-newwin.geometry("850x250") # définition de la taille de la fenêtre
-newwin.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
+roadConfigurationWindow = Tk() # Les lignes suivantes définissent l'interface graphique de la fenêtre principale
+frame_down = Frame (roadConfigurationWindow,height=200,width=850,relief=RAISED,bd=8,bg="black")
+frame_up = Frame (roadConfigurationWindow,height=400,width=850,bd=8,bg="white")
+frame_down.grid(row=1,column=0) 
+frame_up.grid(row=0,column=0) 
+roadConfigurationWindow.title("Configurer des routes") 
+roadConfigurationWindow.configure(bg='#ffffff') 
+roadConfigurationWindow.geometry("850x250") 
+roadConfigurationWindow.resizable(width=False,height=False)
 	
 # définition des variables
 
-route_label = StringVar()
-addresse = StringVar()
-passerelle = StringVar()
-masque = StringVar()
-phrase = StringVar()
+raodLabel = StringVar()
+address = StringVar()
+gateway = StringVar()
+mask = StringVar()
+newRoad = StringVar()
 
 
 ##################################### création des boutons,label etc... ###############################
 ##################################### partie supérieur frame_up #######################################
 	
-labelRoute = Label(frame_up, text="Route :", foreground='white',bg='#1d83ff')
-labelRoute.grid(row=1,column=0)
-entryRoute = Entry(frame_up,textvariable=addresse)  # va permettre de récupérer l'entrée "route" tapée par l'utilisateur
-entryRoute.grid(row=1,column=1)
+roadLabel = Label(frame_up, text="Road :", foreground='white',bg='#1d83ff')
+roadLabel.grid(row=1,column=0)
+addressEntry = Entry(frame_up,textvariable=address)  # va permettre de récupérer l'entrée "road" tapée par l'utilisateur
+addressEntry.grid(row=1,column=1)
 
-labelPasserelle = Label(frame_up, text="Passerelle :", foreground='white',bg='#1d83ff')
-labelPasserelle.grid(row=1,column=2)
-entryPasserelle = Entry(frame_up, textvariable=passerelle) # va permettre de récupérer l'entrée "passerelle" tapée par l'utilisateur
-entryPasserelle.grid(row=1,column=3)
+gatewayLabel = Label(frame_up, text="gateway :", foreground='white',bg='#1d83ff')
+gatewayLabel.grid(row=1,column=2)
+gatewayEntry = Entry(frame_up, textvariable=gateway) # va permettre de récupérer l'entrée "gateway" tapée par l'utilisateur
+gatewayEntry.grid(row=1,column=3)
 
-labelMasque = Label(frame_up, text="Masque :", foreground='white',bg='#1d83ff')
-labelMasque.grid(row=1,column=4)
-entryMasque = Entry(frame_up, textvariable=masque)  # va permettre de récupérer l'entrée "masque" tapée par l'utilisateur
-entryMasque.grid(row=1,column=5)
+maskLabel = Label(frame_up, text="mask :", foreground='white',bg='#1d83ff')
+maskLabel.grid(row=1,column=4)
+maskEntry = Entry(frame_up, textvariable=mask)  # va permettre de récupérer l'entrée "mask" tapée par l'utilisateur
+maskEntry.grid(row=1,column=5)
 
-labelVide = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
-labelVide.grid(row=1,column=6)
+emptyLabel = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
+emptyLabel.grid(row=1,column=6)
 
-buttonEnregistrer=Button(frame_up,command=inscription_route_script)
-buttonEnregistrer.grid(row=1,column=7) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
-buttonEnregistrer.config(image=buttonAddImg)
-buttonEnregistrer.image = buttonAddImg
+SaveButton=Button(frame_up,command=writeRoadToScript) # Bouton qui va lancer la méthode writeRoadToScript 
+SaveButton.grid(row=1,column=7) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+SaveButtonImg = PhotoImage(file="pictures/buttonAdd2.gif")
+SaveButton.config(image=SaveButtonImg)
+SaveButton.image = SaveButtonImg
 
 
-labelVide2 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
-labelVide2.grid(row=1,column=10)
+emptyLabel1 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
+emptyLabel1.grid(row=1,column=10)
 
-buttonFichier=Button(frame_up,command=ouvertureScript)
-buttonFichier.grid(row=1,column=11) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-fichierImg = PhotoImage(file="pictures/fichier.gif")
-buttonFichier.config(image=fichierImg)
-buttonFichier.image = fichierImg
+buttonRoadScriptOpening=Button(frame_up,command=roadScriptOpening)
+buttonRoadScriptOpening.grid(row=1,column=11) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+buttonRoadScriptImg = PhotoImage(file="pictures/fichier.gif")
+buttonRoadScriptOpening.config(image=buttonRoadScriptImg)
+buttonRoadScriptOpening.image = buttonRoadScriptImg
 
 
 ##################################### partie inférieure frame_down #######################################
 	
-labelDown = Label(frame_down,textvariable=route_label)
+labelDown = Label(frame_down,textvariable=raodLabel)
 labelDown.place(x=150,y=10)
 labelDown.configure(foreground="white",bg='#000000')
 	
 buttonActualiser=Button(frame_down, text="Actualiser", foreground = "black", command=route) # lorsque l'utilisateur clique sur le boutton il exécute la fonction "route" 
 buttonActualiser.place(x=740,y=0)
 
-newwin.mainloop()
+roadConfigurationWindow.mainloop()
 
 
