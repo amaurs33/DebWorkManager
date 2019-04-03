@@ -6,7 +6,8 @@ import tkMessageBox
 import ttk
 
 ############################################ definition des fonctions ####################################
-def write_script(filename,string,tag): # fonction qui va inscrire la régle iptables dans la table INPUT ou OUTPUT en fonction de la régle indiquée
+
+def writeIntoOutputOrInput(filename,string,tag): # fonction qui va inscrire la régle iptables dans la table INPUT ou OUTPUT en fonction de la régle indiquée
 
 	with open(filename,'r') as file:
 		content = file.read()
@@ -14,132 +15,131 @@ def write_script(filename,string,tag): # fonction qui va inscrire la régle ipta
 	with open(filename,'w') as file:
 		file.write(new)
 
-def output_interface():
+def outputInterface(): # Le préfix de l'interface sera -o
 
-	interface_prefixe.set("-o ")
-	actualiser_phrase()
+	interfacePrefix.set("-o ")
+	ruleActualize()
 
-def input_interface():
+def inputInterface(): # Le préfix de l'interface sera -i
 
-	interface_prefixe.set("-i ")
-	actualiser_phrase()
+	interfacePrefix.set("-i ")
+	ruleActualize()
 
-def dest_def():
+def portDestination(): # Le port sera positionné en destination --dport
 
 	destination.set("--dport ")
-	actualiser_phrase()
+	ruleActualize()
 
-def source_def():
+def sourceDestination(): # Le port sera positionné en source --sport
 
 	destination.set("--sport ")
-	actualiser_phrase()
+	ruleActualize()
 
-def reinit_tout():
+def resetAll(): # Réinitialise toute les valeurs des différentes composantes de la régle iptable
 
-	phrase.set('')
+	rule.set('')
 	protocol_M.set('')
-	input_B.set("OUTPUT ")
-	input_B.set("INPUT ")
-	status_M.set("")
+	trafficDirection.set("")
+	state.set("")
 	autorisation.set("")
 	destination.set("")
 	port_L.set("")
 	interface.set("")
-	interface_prefixe.set("")
+	interfacePrefix.set("")
 
-def actualiser_phrase():
+def ruleActualize(): # Actualise la régle iptable en cour de création
 
-	phrase.set("") # réinitialisation de la variable phrase
-	phrase.set("iptables -A "+input_B.get()+output_B.get()+interface_prefixe.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+status_M.get()+autorisation.get())
+	rule.set("") 
+	rule.set("iptables -A "+trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get())
 	
-def udp_button():
+def udp_button(): # Positionne la valeur du protocol sur UDP
 
 	protocol_M.set(udp.get())
-	actualiser_phrase()
+	ruleActualize()
 
-def tcp_button():
+def tcp_button(): # Positionne la valeur du protocol sur TCP
 
 	protocol_M.set(tcp.get())
-	actualiser_phrase()
+	ruleActualize()
 
-def icmp_button():
+def icmp_button(): # Positionne la valeur du protocol sur ICMP
 
 	protocol_M.set(icmp.get())
-	actualiser_phrase()
+	ruleActualize()
 
-def newRE_button():
+def newRelatedEstablished_button(): # Positionne le status sur new,related,established
 
-	status_M.set(newRE.get())
-	actualiser_phrase()
+	state.set(newRelatedEstablished.get())
+	ruleActualize()
 
-def relatedE_button():
+def RelatedEstablished_button(): # Positionne le status sur related,established
 
-	status_M.set(relatedE.get())
-	actualiser_phrase()
+	state.set(relatedE.get())
+	ruleActualize()
 
-def new_button():
+def new_button(): # Positionne le status sur new
 
-	status_M.set(new.get())
-	actualiser_phrase()
+	state.set(new.get())
+	ruleActualize()
 
-def related_button():
+def related_button():# Positionne le status sur related
 
-	status_M.set(related.get())
-	actualiser_phrase()
+	state.set(related.get())
+	ruleActualize()
 
-def estabish_button():
+def establish_button(): # Positionne le status sur established
 
-	status_M.set(estabish.get())
-	actualiser_phrase()
+	state.set(estabish.get())
+	ruleActualize()
 
-def accept_button():
+def accept_button(): # La régle iptable sera en -j ACCEPT
 
 	autorisation.set(" -j ACCEPT")
-	actualiser_phrase()
+	ruleActualize()
 
-def reject_button():
+def reject_button(): # La régle iptable sera en -j REJECT
 
 	autorisation.set(" -j REJECT")
-	actualiser_phrase()
+	ruleActualize()
 
-def drop_button():
+def drop_button(): # La régle iptable sera en -j DROP
 
 	autorisation.set(" -j DROP")
-	actualiser_phrase()
+	ruleActualize()
 
-def input_button():
+def trafficDirection_Button(): # La régle iptable concernera le traffic en entrée
 	
-	input_B.set("INPUT ")
-	actualiser_phrase()
+	trafficDirection.set("INPUT ")
+	ruleActualize()
 
-def output_button():
+def output_button(): # La régle iptable concernera le traffic en sortie
 	
-	input_B.set("OUTPUT ")
-	actualiser_phrase()
+	trafficDirection.set("OUTPUT ")
+	ruleActualize()
 
-def inscription_iptable_script():
+def writeIntoScript(): # Inscrit la régle iptable dans le script iptable_init.sh et appelle la fonction "writIntoOutputOrInput" de façon à la positionner au bon endroit
 
-	phrase.set("iptables -A "+input_B.get()+output_B.get()+interface_prefixe.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+status_M.get()+autorisation.get())
+	rule.set("iptables -A "+trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get())
 	
-	if 'INPUT' in phrase.get():
+	if 'INPUT' in rule.get():
 
-	    write_script('scripts/iptable_init.sh', "\n"+phrase.get(), '#table_INPUT')
+	    writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_INPUT')
 
-	if 'OUTPUT' in phrase.get():
+	if 'OUTPUT' in rule.get():
 
-	    write_script('scripts/iptable_init.sh', "\n"+phrase.get(), '#table_OUTPUT')
+	    writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_OUTPUT')
 
-	reinit_tout()
-	phrase.set("")
-	tkMessageBox.showinfo("Réussite", "Opération effectuée")
+	resetAll()
+	rule.set("")
+	tkMessageBox.showinfo("Succes", "The rule is saved in the script")
 
-def ouvertureScript():
+def scriptLoad(): # Ouvre le script iptabl_init.sh de façon à pouvoir faire des modification directement
 
 	odtPrint = subprocess.Popen(["loffice","scripts/iptable_init.sh"], stdout=subprocess.PIPE)
 	output = odtPrint.communicate()[0]
 	print(output)		
 
-def sudo():	
+def sudo():	# Fenêtre permettant l'authentification afin d'afficher les régles iptables
 
 	def closeWindow():
 
@@ -148,20 +148,20 @@ def sudo():
 	def variable():
 
 		sudo_password.set(saisie.get())
-		affichageReglesIptable()
+		displayIptableRules() # affiche les régles iptable
 		closeWindow()
 	
-	sudoWindow = Toplevel(win_iptable)
-	sudoWindow.title("Authentification sudo")
-	sudoWindow.lift(aboveThis=win_iptable)
-	labelVide2 = Label(sudoWindow,text="veuillez saisir le mot de passe root :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
-	labelVide2.grid(row=0,column=0)
-	entryPort = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
-	entryPort.grid(row=1,column=0)
-	buttonEnregistrer=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
-	buttonEnregistrer.grid(row=2,column=0)
+	sudoWindow = Toplevel(iptable_window)
+	sudoWindow.title("root authentification")
+	sudoWindow.lift(aboveThis=iptable_window)
+	emptyLabel2 = Label(sudoWindow,text="Enter the root password, please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+	emptyLabel2.grid(row=0,column=0)
+	entryPasswd = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
+	entryPasswd.grid(row=1,column=0)
+	saveButton=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
+	saveButton.grid(row=2,column=0)
 
-def affichageReglesIptable():
+def displayIptableRules(): # affiche les régles iptables du PC cible
 	
 	command = "sudo iptables -L -n"
 	command = command.split()
@@ -177,59 +177,48 @@ def affichageReglesIptable():
 	 	
 	else:
 		sudo_password.set("")
-		tkMessageBox.showerror("Erreur","Mot de passe incorrect")
+		tkMessageBox.showerror("Error","wrong password, try again")
 		
-####################################### Fenêtre secondaire iptable #######################################
-
-win_iptable = Tk()
+####################################### MAIN #######################################
 
 ### mise en forme de la fenêtre principale ###
-
-frame_down = Frame (win_iptable,height=650,width=1000,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
-frame_up = Frame (win_iptable,height=900,width=1000,bd=8,bg="white")
+iptable_window = Tk() # Le paragraphe suivant va déterminé les régles de configurationd e la fenêtre principale
+frame_down = Frame (iptable_window,height=650,width=1000,relief=RAISED,bd=8,bg="black") # frame_down et frame_up vont permettre de scinder la fenêtre en deux parties
+frame_up = Frame (iptable_window,height=900,width=1000,bd=8,bg="white")
 frame_down.grid(row=1,column=0) # Placement des fenêtres
 frame_up.grid(row=0,column=0) # Placement des fenêtres
-win_iptable.title("Configuration des régles iptables") # définition du titre de la fenêtre
-win_iptable.configure(bg='#ffffff') # définition de la couleur de fond de la fenêtre
-win_iptable.geometry("1000x700") # définition de la taille de la fenêtre
-win_iptable.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
+iptable_window.title("Iptable rules configuration") # définition du titre de la fenêtre
+iptable_window.configure(bg='#ffffff') # définition de la couleur de fond de la fenêtre
+iptable_window.geometry("1000x700") # définition de la taille de la fenêtre
+iptable_window.resizable(width=False,height=False) # rend impossible le redimensionnement de la fenêtre
 
 # définition des variables
 iptableResult = StringVar()
-affichage_label = StringVar()
 sudo_password = StringVar()
 saisie = StringVar()
-
-#Variables de configuration
 interface = StringVar()
 interface.set("")
-input_B = StringVar()
-input_B.set("")
+trafficDirection = StringVar()
+trafficDirection.set("")
 output_B = StringVar()
 output_B.set("")
 protocol_M = StringVar()
 protocol_M.set("")
 port_L = StringVar()
 port_L.set("")
-status_M = StringVar()
-status_M.set("")
+state = StringVar()
+state.set("")
 autorisation = StringVar()
 autorisation.set("")
-#drop_B = StringVar()
-#drop_B.set("")
-#accept_B = StringVar()
-#accept_B.set("")
-#reject_B = StringVar()
-#reject_B.set("")
-phrase = StringVar()
+rule = StringVar()
 udp = StringVar()
 udp.set(" -p udp ")
 tcp = StringVar()
 tcp.set(" -p tcp ")
 icmp = StringVar()
 icmp.set(" -p icmp ")
-newRE = StringVar()
-newRE.set(" -m state --state NEW,ESTABLISHED,RELATED")
+newRelatedEstablished = StringVar()
+newRelatedEstablished.set(" -m state --state NEW,ESTABLISHED,RELATED")
 relatedE = StringVar()
 relatedE.set(" -m state --state RELATED,ESTABLISHED")
 new = StringVar()
@@ -240,126 +229,127 @@ estabish = StringVar()
 estabish.set(" -m state --state ESTABLISHED")
 destination = StringVar()
 destination.set("")
-interface_prefixe = StringVar()
-interface_prefixe.set("")
+interfacePrefix = StringVar()
+interfacePrefix.set("")
+
 ##################################### création des boutons,label etc... ###############################
 ##################################### partie supérieur frame_up #######################################
 
-mb3 = Menubutton(frame_up, text='Interface :') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
-mb3.grid(row=0,column=0)
-mb3.menu = Menu(mb3)
-mb3["menu"] = mb3.menu
-mb3.menu.add_command(label='-o', command=output_interface)
-mb3.menu.add_command(label='-i',command=input_interface)
+menuinputButtonOrOutput = Menubutton(frame_up, text='Interface :') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
+menuinputButtonOrOutput.grid(row=0,column=0)
+menuinputButtonOrOutput.menu = Menu(menuinputButtonOrOutput)
+menuinputButtonOrOutput["menu"] = menuinputButtonOrOutput.menu
+menuinputButtonOrOutput.menu.add_command(label='-o', command=outputInterface)
+menuinputButtonOrOutput.menu.add_command(label='-i',command=inputInterface)
 
-labelVide = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
-labelVide.grid(row=0,column=1)
+emptyLabel = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les éléments
+emptyLabel.grid(row=0,column=1)
 
-entryName = Entry(frame_up,textvariable=interface)
-entryName.grid(row=0,column=2)
+entryInterface = Entry(frame_up,textvariable=interface)
+entryInterface.grid(row=0,column=2)
 
-labelVide1 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide1.grid(row=0,column=3)
+emptyLabel1 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel1.grid(row=0,column=3)
 
-buttonINPUT=Button(frame_up, command=input_button)
-buttonINPUT.grid(row=0,column=4) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg = PhotoImage(file="pictures/INPUT.gif")
-buttonINPUT.config(image=buttonAddImg)
-buttonINPUT.image = buttonAddImg
+inputButton=Button(frame_up, command=trafficDirection_Button)
+inputButton.grid(row=0,column=4) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+inputButtonImg = PhotoImage(file="pictures/INPUT.gif")
+inputButton.config(image=inputButtonImg)
+inputButton.image = inputButtonImg
 
-labelVide2 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide2.grid(row=0,column=5)
+emptyLabel2 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel2.grid(row=0,column=5)
 
-buttonOUTPUT=Button(frame_up,command=output_button)
-buttonOUTPUT.grid(row=0,column=6) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg1 = PhotoImage(file="pictures/OUTPUT.gif")
-buttonOUTPUT.config(image=buttonAddImg1)
-buttonOUTPUT.image = buttonAddImg1
+outputbutton=Button(frame_up,command=output_button)
+outputbutton.grid(row=0,column=6) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+outputButtonImg = PhotoImage(file="pictures/OUTPUT.gif")
+outputbutton.config(image=outputButtonImg)
+outputbutton.image = outputButtonImg
 
-labelVide2 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide2.grid(row=0,column=7)
+emptyLabel2 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel2.grid(row=0,column=7)
 
-mb = Menubutton(frame_up, text='protocol') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
-mb.grid(row=0,column=8)
-mb.menu = Menu(mb)
-mb["menu"] = mb.menu
-mb.menu.add_command(label='udp', command=udp_button)
-mb.menu.add_command(label='tcp',command=tcp_button)
-mb.menu.add_command(label='icmp',command=icmp_button)
+menuButtonProtocol = Menubutton(frame_up, text='protocol') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
+menuButtonProtocol.grid(row=0,column=8)
+menuButtonProtocol.menu = Menu(menuButtonProtocol)
+menuButtonProtocol["menu"] = menuButtonProtocol.menu
+menuButtonProtocol.menu.add_command(label='udp', command=udp_button)
+menuButtonProtocol.menu.add_command(label='tcp',command=tcp_button)
+menuButtonProtocol.menu.add_command(label='icmp',command=icmp_button)
 
-labelVide3 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide3.grid(row=0,column=9)
+emptyLabel3 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel3.grid(row=0,column=9)
 
-mb1 = Menubutton(frame_up, text='Port :') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
-mb1.grid(row=0,column=10)
-mb1.menu = Menu(mb1)
-mb1["menu"] = mb1.menu
-mb1.menu.add_command(label='destination', command=dest_def)
-mb1.menu.add_command(label='source',command=source_def)
+menuButtonPort = Menubutton(frame_up, text='Port :') # Création d'un menu button qui va permettre de selectionner le protocol souhaité
+menuButtonPort.grid(row=0,column=10)
+menuButtonPort.menu = Menu(menuButtonPort)
+menuButtonPort["menu"] = menuButtonPort.menu
+menuButtonPort.menu.add_command(label='destination', command=portDestination)
+menuButtonPort.menu.add_command(label='source',command=sourceDestination)
 
-labelVide4 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide4.grid(row=0,column=11)
+emptyLabel4 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel4.grid(row=0,column=11)
 
 entryPort = Entry(frame_up,textvariable=port_L)
 entryPort.grid(row=0,column=12)
 
-labelVide5 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelVide5.grid(row=0,column=13)
+emptyLabel5 = Label(frame_up,text="  ",bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel5.grid(row=0,column=13)
 
-mb2 = Menubutton(frame_up, text='status') # Création d'un menu button qui va permettre de selectionner le status souhaité
-mb2.grid(row=0,column=14)
-mb2.menu = Menu(mb2)
-mb2["menu"] = mb2.menu
-mb2.menu.add_command(label='NEW,RELATED,ESTABLISHED', command=newRE_button)
-mb2.menu.add_command(label='RELATED,ESTABLISHED', command=relatedE_button)
-mb2.menu.add_command(label='NEW', command=new_button)
-mb2.menu.add_command(label='RELATED', command=related_button)
-mb2.menu.add_command(label='ESTABLISHED', command=estabish_button)
+menuButtonstate = Menubutton(frame_up, text='state') # Création d'un menu button qui va permettre de selectionner le status souhaité
+menuButtonstate.grid(row=0,column=14)
+menuButtonstate.menu = Menu(menuButtonstate)
+menuButtonstate["menu"] = menuButtonstate.menu
+menuButtonstate.menu.add_command(label='NEW,RELATED,ESTABLISHED', command=newRelatedEstablished_button)
+menuButtonstate.menu.add_command(label='RELATED,ESTABLISHED', command=RelatedEstablished_button)
+menuButtonstate.menu.add_command(label='NEW', command=new_button)
+menuButtonstate.menu.add_command(label='RELATED', command=related_button)
+menuButtonstate.menu.add_command(label='ESTABLISHED', command=establish_button)
 
-labelName1 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelName1.grid(row=0,column=15)
+emptyLabel6 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel6.grid(row=0,column=15)
 
-buttonACCEPT=Button(frame_up,command=accept_button)
-buttonACCEPT.grid(row=0,column=16) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg2 = PhotoImage(file="pictures/accept.gif")
-buttonACCEPT.config(image=buttonAddImg2)
-buttonACCEPT.image = buttonAddImg2
+acceptButton=Button(frame_up,command=accept_button)
+acceptButton.grid(row=0,column=16) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+acceptButtonImg = PhotoImage(file="pictures/accept.gif")
+acceptButton.config(image=acceptButtonImg)
+acceptButton.image = acceptButtonImg
 
-labelName2 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelName2.grid(row=0,column=17)
+emptyLabel7 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel7.grid(row=0,column=17)
 
-buttonDROP=Button(frame_up,command=drop_button)
-buttonDROP.grid(row=0,column=18) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg3 = PhotoImage(file="pictures/DROP.gif")
-buttonDROP.config(image=buttonAddImg3)
-buttonDROP.image = buttonAddImg3
+dropbutton=Button(frame_up,command=drop_button)
+dropbutton.grid(row=0,column=18) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+dropbuttonImg = PhotoImage(file="pictures/DROP.gif")
+dropbutton.config(image=dropbuttonImg)
+dropbutton.image = dropbuttonImg
 
-labelName3 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelName3.grid(row=0,column=19)
+emptyLabel8 = Label(frame_up, text=" ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel8.grid(row=0,column=19)
 
-buttonREJECT=Button(frame_up,command=reject_button)
-buttonREJECT.grid(row=0,column=20) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg4 = PhotoImage(file="pictures/reject.gif")
-buttonREJECT.config(image=buttonAddImg4)
-buttonREJECT.image = buttonAddImg4
+rejectButton=Button(frame_up,command=reject_button)
+rejectButton.grid(row=0,column=20) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+rejectButtonImg = PhotoImage(file="pictures/reject.gif")
+rejectButton.config(image=rejectButtonImg)
+rejectButton.image = rejectButtonImg
 
-labelName4 = Label(frame_up, text="              ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
-labelName4.grid(row=0,column=21)
+emptyLabel9 = Label(frame_up, text="              ", foreground='white',bg='#ffffff') # Ces deux lignes permettent juste d'espacer les élements
+emptyLabel9.grid(row=0,column=21)
 
-buttonEnregistrer=Button(frame_up,command=inscription_iptable_script)
-buttonEnregistrer.grid(row=0,column=22) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
-buttonEnregistrer.config(image=buttonAddImg)
-buttonEnregistrer.image = buttonAddImg
+saveButton=Button(frame_up,command=writeIntoScript)
+saveButton.grid(row=0,column=22) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+inputButtonImg = PhotoImage(file="pictures/buttonAdd2.gif")
+saveButton.config(image=inputButtonImg)
+saveButton.image = inputButtonImg
 
-buttonActualiser_phrase=Button(frame_up,command=reinit_tout)
-buttonActualiser_phrase.grid(row=1,column=0) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
-buttonActualiserImg = PhotoImage(file="pictures/afficher.gif")
-buttonActualiser_phrase.config(image=buttonActualiserImg)
-buttonActualiser_phrase.image = buttonActualiserImg
+buttonruleActualize=Button(frame_up,command=resetAll)
+buttonruleActualize.grid(row=1,column=0) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
+buttonActualizeImg = PhotoImage(file="pictures/afficher.gif")
+buttonruleActualize.config(image=buttonActualizeImg)
+buttonruleActualize.image = buttonActualizeImg
 
-entryPort = Entry(frame_up, bd=5, width=90,textvariable=phrase,foreground='red',font='Helvetica 14 bold')
-entryPort.place(x=75,y=38)
+entryRule = Entry(frame_up, bd=5, width=90,textvariable=rule,foreground='red',font='Helvetica 14 bold')
+entryRule.place(x=75,y=38)
 
 ##################################### partie inférieure frame_down #######################################
 
@@ -368,13 +358,13 @@ labelDown.place(x=150,y=10)
 labelDown.configure(foreground="white",bg='#000000')
 iptableResult.set("")
 
-buttonFichier=Button(frame_down,command=ouvertureScript)
+buttonFichier=Button(frame_down,command=scriptLoad)
 buttonFichier.place(x=0,y=0) # Les quatres prochaines lignes sont relatives à la mise en forme du bouton
 fichierImg = PhotoImage(file="pictures/fichier.gif")
 buttonFichier.config(image=fichierImg)
 buttonFichier.image = fichierImg
 
-buttonActualiser=Button(frame_down, text="Actualiser", foreground = "black", command=sudo)#, command=route)
-buttonActualiser.place(x=890,y=0)
+actualizeButton=Button(frame_down, text="Actualize", foreground = "black", command=sudo)
+actualizeButton.place(x=890,y=0)
 
-win_iptable.mainloop()
+iptable_window.mainloop()

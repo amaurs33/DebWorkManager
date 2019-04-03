@@ -6,10 +6,8 @@ import getpass # cacher le mot de passe
 import tkMessageBox
 
 
-
 ############################################ definition des fonctions ####################################
 	
-
 
 def writeRoadToScript(): # Inscription de la nouvelle route dans le fichier route_init.sh
 
@@ -23,9 +21,9 @@ def writeRoadToScript(): # Inscription de la nouvelle route dans le fichier rout
 	address.set("")
 	newRoad.set("")
 
-	tkMessageBox.showinfo("Réussite", "Opération effectuée") # Affichage de la réussite de l'enregistrement
+	tkMessageBox.showinfo("Succes", "New road is saved in the script") # Affichage de la réussite de l'enregistrement
 
-def route() : # exécution de la commande : route -n afin d'afficher les routes définient
+def getRoadDisplay() : # exécution de la commande : route -n afin d'afficher les routes définient
 
 	raodDisplayCommandLine = subprocess.Popen(["route","-n"], stdout=subprocess.PIPE) # Exécution de la commande route -n
 	output = raodDisplayCommandLine.communicate()[0]
@@ -43,7 +41,7 @@ frame_down = Frame (roadConfigurationWindow,height=200,width=850,relief=RAISED,b
 frame_up = Frame (roadConfigurationWindow,height=400,width=850,bd=8,bg="white")
 frame_down.grid(row=1,column=0) 
 frame_up.grid(row=0,column=0) 
-roadConfigurationWindow.title("Configurer des routes") 
+roadConfigurationWindow.title("Road configuration") 
 roadConfigurationWindow.configure(bg='#ffffff') 
 roadConfigurationWindow.geometry("850x250") 
 roadConfigurationWindow.resizable(width=False,height=False)
@@ -101,8 +99,8 @@ labelDown = Label(frame_down,textvariable=raodLabel)
 labelDown.place(x=150,y=10)
 labelDown.configure(foreground="white",bg='#000000')
 	
-buttonActualiser=Button(frame_down, text="Actualiser", foreground = "black", command=route) # lorsque l'utilisateur clique sur le boutton il exécute la fonction "route" 
-buttonActualiser.place(x=740,y=0)
+displayButton=Button(frame_down, text="Actualize", foreground = "black", command=getRoadDisplay) # lorsque l'utilisateur clique sur le boutton il exécute la fonction "route" 
+displayButton.place(x=740,y=0)
 
 roadConfigurationWindow.mainloop()
 

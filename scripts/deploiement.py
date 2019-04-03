@@ -69,7 +69,7 @@ def databaseAdd (): # Ajout de données dans la base de donnée IP - USER
 	entriesIpUser = (ipAddress.get(),userName.get()) # Récupération des valeurs entrées dans les textBox : IP et USER
 	curseur.execute('''INSERT INTO ip_ssh (IP, USER ) VALUES (?,?)''',entriesIpUser) # Insertion dans la base de donnée
 	connexion.commit() # Fermeture de la connection
-	tkMessageBox.showinfo("Succes", "Opération effectuée")
+	tkMessageBox.showinfo("Success", "add to database")
 	connexion.close() # Fermeture de la connection
 	ipAddress.set("") # Réinitialisation de l'adresse IP
 	userName.set("") # Réinitialisation du nom de l'utilisateur
@@ -95,7 +95,7 @@ frame_down = Frame (windowDeployment,height=650,width=1000,relief=RAISED,bd=8,bg
 frame_up = Frame (windowDeployment,height=900,width=1000,bd=8,bg="white")
 frame_down.grid(row=1,column=0) # Placement des fenêtres
 frame_up.grid(row=0,column=0) # Placement des fenêtres
-windowDeployment.title("Configurer des routes")
+windowDeployment.title("road configuration")
 windowDeployment.configure(bg='#ffffff')
 windowDeployment.geometry("800x130")
 windowDeployment.resizable(width=False,height=False)
@@ -113,7 +113,7 @@ IpSelected.set('')
 
 ### Mise en place des éléments dans la fenêtre windows deployment
 
-labelIpAdd = Label(frame_up, text="Ajouter une adresse IP :", foreground='white',bg='#1d83ff') 
+labelIpAdd = Label(frame_up, text="Add the new IP address :", foreground='white',bg='#1d83ff') 
 labelIpAdd.grid(row=1,column=0)
 entryIp = Entry(frame_up,textvariable=ipAddress) # Textbox d'entrée d'adresse IP dans le srtingVar ipAdress
 entryIp.grid(row=1,column=1)
@@ -121,7 +121,7 @@ entryIp.grid(row=1,column=1)
 emptyLabel = Label(frame_up,text="  ",bg='#ffffff') # Label vide pour l'espacement
 emptyLabel.grid(row=1,column=2)
 
-labelName = Label(frame_up, text="Associez-lui un nom d'utilisateur :", foreground='white',bg='#1d83ff') 
+labelName = Label(frame_up, text="Give it a username :", foreground='white',bg='#1d83ff') 
 labelName.grid(row=1,column=3)
 entryName = Entry(frame_up,textvariable=userName) #Textbox d'entrée du nom d'utilisateur dans le srtingVar userName
 entryName.grid(row=1,column=4)
@@ -135,7 +135,7 @@ buttonAddImg = PhotoImage(file="pictures/buttonAdd2.gif")
 saveButton.config(image=buttonAddImg)
 saveButton.image = buttonAddImg
 
-labelName = Label(frame_down, text="Sélectionnez un utilisateur:", foreground='white',bg='#6a8bff')
+labelName = Label(frame_down, text="Select one user :", foreground='white',bg='#6a8bff')
 labelName.grid(row=2,column=2)
 
 listboxUserToIp = Listbox(frame_down, height =2) # création de la listbox pour choisir vers quelle adresse IP/USER la connexion SSH doit être effectuée 
