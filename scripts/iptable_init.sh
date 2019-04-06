@@ -44,6 +44,7 @@ iptables -t mangle -P POSTROUTING ACCEPT
 
 
 #table_INPUT
+iptables -A INPUT sdf -p tcp --sport 
 iptables -A INPUT -o et0 -p udp --dport 90 -m state --state NEW,ESTABLISHED,RELATED -j REJECT
 
 

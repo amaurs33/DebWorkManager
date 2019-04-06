@@ -10,11 +10,3 @@
 ### END INIT INFO
 
 
-
-
-
-
-
-route add -net  netmask  gw 
-route add -net 10.0.0.1 netmask 255.255.255.0 gw 10.0.1.1
-route add -net 10.0.1.3 netmask 225.255.255.0 gw 10.9.9.9

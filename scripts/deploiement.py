@@ -41,13 +41,13 @@ def deployment(): # Fonction qui va déployer les fichier iptable_init.sh et rou
 	SSHConnection = subprocess.Popen([copySSHcommand,updateRcSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
 	outputSSHConnection,error = SSHConnection.communicate()
 
-	if outputSSHConnection:
+	if outputSSHConnection: # gestion de l'exception de mauvais mot de passe ou d'une machine non connectée
 		SSHpasswd.set('')
 		tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
 	 	
 	else:
 		SSHpasswd.set('')
-		tkMessageBox.showerror("Error","wrong password, try again")
+		tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
 	
 
 def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données

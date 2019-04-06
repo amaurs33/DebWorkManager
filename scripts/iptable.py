@@ -7,207 +7,220 @@ import ttk
 import sqlite3
 
 ############################################ definition des fonctions ####################################
-def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
-	
-	def closeWindow():
+def getSSHPasswd(): # Fenêtre permettant de se connecter en super-utilisateur
+    
+    def closeWindow():
 
-		SSHpasswdWindows.destroy() # Fermeture de la fenêtre de mot de passe SSH
+        SSHpasswdWindows.destroy() # Fermeture de la fenêtre de mot de passe SSH
 
-	def getInputPasswd():
+    def getInputPasswd():
 
-		SSHpasswd.set(readInputSSHPasswd.get()) # On associe la valeur entrée au stringVar SSHpasswd
-		closeWindow()
-		getIptableRuleToUser() # Appelle de la méthode d'affichage des logs
-	
-	SSHpasswdWindows = Toplevel(iptable_window) # Composition graphique de la fenêtre
+        SSHpasswd.set(readInputSSHPasswd.get()) # On associe la valeur entrée au stringVar SSHpasswd
+        closeWindow()
+        getIptableRuleToUser() # Appelle de la méthode d'affichage des logs
+    
+    SSHpasswdWindows = Toplevel(iptable_window) # Composition graphique de la fenêtre
 
-	SSHpasswdWindows.title("ssh connection authentification")
-	SSHpasswdWindows.lift(aboveThis=iptable_window)
-	labelSSHPasswd = Label(SSHpasswdWindows,text="Enter SSH password please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
-	labelSSHPasswd.grid(row=0,column=0)
-	entrySSHPasswd = Entry(SSHpasswdWindows, bd=5, width=20, show="*",textvariable=readInputSSHPasswd)
-	entrySSHPasswd.grid(row=1,column=0)
-	saveButton=Button(SSHpasswdWindows,command=getInputPasswd, text="Accept", fg="white", bg="#c90000",font='Helvetica 14 bold') # Le bouton enregistré appelle la fonction getInputPasswd qui associe le mot de passe saisi au stringVar SSHpasswd
-	saveButton.grid(row=2,column=0)
+    SSHpasswdWindows.title("ssh connection authentification")
+    SSHpasswdWindows.lift(aboveThis=iptable_window)
+    labelSSHPasswd = Label(SSHpasswdWindows,text="Enter SSH password please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+    labelSSHPasswd.grid(row=0,column=0)
+    entrySSHPasswd = Entry(SSHpasswdWindows, bd=5, width=20, show="*",textvariable=readInputSSHPasswd)
+    entrySSHPasswd.grid(row=1,column=0)
+    saveButton=Button(SSHpasswdWindows,command=getInputPasswd, text="Accept", fg="white", bg="#c90000",font='Helvetica 14 bold') # Le bouton enregistré appelle la fonction getInputPasswd qui associe le mot de passe saisi au stringVar SSHpasswd
+    saveButton.grid(row=2,column=0)
 
 
 def getIptableRuleToUser(): # Fonction qui va déployer les fichier iptable_init.sh et route_init.sh grâce à une connection SSH
 
-	iptableSSHCommand =  "sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'sudo iptables -L -n'" # commande qui affiche les régles iptables distantes
-	
-	
-	SSHConnection = subprocess.Popen([iptableSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
-	outputSSHConnection,error = SSHConnection.communicate()
+    iptableSSHCommand =  "sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'sudo iptables -L -n'" # commande qui affiche les régles iptables distantes
+    
+    
+    SSHConnection = subprocess.Popen([iptableSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
+    outputSSHConnection,error = SSHConnection.communicate()
 
-	if outputSSHConnection:
-		SSHpasswd.set('')
-		iptableResult.set(outputSSHConnection)
-	 	
-	else:
-		SSHpasswd.set('')
-		tkMessageBox.showerror("Error","wrong password, try again")
+    if outputSSHConnection: # gestion de l'exception de mauvais mot de passe ou d'une machine non connectée
+        SSHpasswd.set('')
+        iptableResult.set(outputSSHConnection)
+        
+    else:
+        SSHpasswd.set('')
+        tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
 
 
 def databaseCreationIpUser () : # Création de la base de donnée IP - USER
 
-	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
-	curseur = connexion.cursor()
-	curseur.execute('''CREATE TABLE IF NOT EXISTS ip_ssh (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, IP TEXT, USER TEXT)''') # création de la table logFiles
-	connexion.close() # Fermeture de la connection
+    connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+    curseur = connexion.cursor()
+    curseur.execute('''CREATE TABLE IF NOT EXISTS ip_ssh (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, IP TEXT, USER TEXT)''') # création de la table logFiles
+    connexion.close() # Fermeture de la connection
 
 def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données
 
-	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
-	curseur = connexion.cursor()
-	getUserInListbox = listboxUserToIp.get(listboxUserToIp.curselection())
-	curseur.execute("SELECT IP FROM ip_ssh WHERE USER LIKE '%s'" % getUserInListbox) # Récupération de l'IP suivant l'utilisateur selectionné dans la listbox
-	record = curseur.fetchone()
-	IpSelected.set(record[0]) 
-	connexion.close() # Fermeture de la connexion SSH
-	getSSHPasswd() # Appelle de la fonction getSSHPasswd afin de pouvoir authentifier la connection SSH
+    connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+    curseur = connexion.cursor()
+    getUserInListbox = listboxUserToIp.get(listboxUserToIp.curselection())
+    curseur.execute("SELECT IP FROM ip_ssh WHERE USER LIKE '%s'" % getUserInListbox) # Récupération de l'IP suivant l'utilisateur selectionné dans la listbox
+    record = curseur.fetchone()
+    IpSelected.set(record[0]) 
+    connexion.close() # Fermeture de la connexion SSH
+    getSSHPasswd() # Appelle de la fonction getSSHPasswd afin de pouvoir authentifier la connection SSH
 
 def listboxIntegration () : # Fonction qui va intégrer des valeurs dans la listBox
 
-	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
-	curseur = connexion.cursor()
-	curseur.execute("SELECT USER FROM ip_ssh") # Récupération des valeurs "nom" dans la base de donnée pour l'insérer dans la listeBox
-	i=0
-	for row in curseur.fetchall():
-		listboxUserToIp.insert(i,row[0])
-		i=i+1
-	connexion.close() # Fermeture de la base de donnée
+    connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+    curseur = connexion.cursor()
+    curseur.execute("SELECT USER FROM ip_ssh") # Récupération des valeurs "nom" dans la base de donnée pour l'insérer dans la listeBox
+    i=0
+    for row in curseur.fetchall():
+        listboxUserToIp.insert(i,row[0])
+        i=i+1
+    connexion.close() # Fermeture de la base de donnée
 
 def writeIntoOutputOrInput(filename,string,tag): # fonction qui va inscrire la régle iptables dans la table INPUT ou OUTPUT en fonction de la régle indiquée
 
-	with open(filename,'r') as file:
-		content = file.read()
-		new = content.replace(tag,''.join([tag, string]))
-	with open(filename,'w') as file:
-		file.write(new)
+    with open(filename,'r') as file:
+        content = file.read()
+        new = content.replace(tag,''.join([tag, string]))
+    with open(filename,'w') as file:
+        file.write(new)
 
 def outputInterface(): # Le préfix de l'interface sera -o
 
-	interfacePrefix.set("-o ")
-	ruleActualize()
+    interfacePrefix.set("-o ")
+    ruleActualize()
 
 def inputInterface(): # Le préfix de l'interface sera -i
 
-	interfacePrefix.set("-i ")
-	ruleActualize()
+    interfacePrefix.set("-i ")
+    ruleActualize()
 
 def portDestination(): # Le port sera positionné en destination --dport
 
-	destination.set("--dport ")
-	ruleActualize()
+    destination.set("--dport ")
+    ruleActualize()
 
 def sourceDestination(): # Le port sera positionné en source --sport
 
-	destination.set("--sport ")
-	ruleActualize()
+    destination.set("--sport ")
+    ruleActualize()
 
 def resetAll(): # Réinitialise toute les valeurs des différentes composantes de la régle iptable
 
-	rule.set('')
-	protocol_M.set('')
-	trafficDirection.set("")
-	state.set("")
-	autorisation.set("")
-	destination.set("")
-	port_L.set("")
-	interface.set("")
-	interfacePrefix.set("")
+    rule.set('')
+    protocol_M.set('')
+    trafficDirection.set("")
+    state.set("")
+    autorisation.set("")
+    destination.set("")
+    port_L.set("")
+    interface.set("")
+    interfacePrefix.set("")
 
 def ruleActualize(): # Actualise la régle iptable en cour de création
 
-	rule.set("") 
-	rule.set("iptables -A "+trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get())
-	
+    rule.set("") 
+    rule.set("iptables -A "+trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get())
+    
 def udp_button(): # Positionne la valeur du protocol sur UDP
 
-	protocol_M.set(udp.get())
-	ruleActualize()
+    protocol_M.set(udp.get())
+    ruleActualize()
 
 def tcp_button(): # Positionne la valeur du protocol sur TCP
 
-	protocol_M.set(tcp.get())
-	ruleActualize()
+    protocol_M.set(tcp.get())
+    ruleActualize()
 
 def icmp_button(): # Positionne la valeur du protocol sur ICMP
 
-	protocol_M.set(icmp.get())
-	ruleActualize()
+    protocol_M.set(icmp.get())
+    ruleActualize()
 
 def newRelatedEstablished_button(): # Positionne le status sur new,related,established
 
-	state.set(newRelatedEstablished.get())
-	ruleActualize()
+    state.set(newRelatedEstablished.get())
+    ruleActualize()
 
 def RelatedEstablished_button(): # Positionne le status sur related,established
 
-	state.set(relatedE.get())
-	ruleActualize()
+    state.set(relatedE.get())
+    ruleActualize()
 
 def new_button(): # Positionne le status sur new
 
-	state.set(new.get())
-	ruleActualize()
+    state.set(new.get())
+    ruleActualize()
 
 def related_button():# Positionne le status sur related
 
-	state.set(related.get())
-	ruleActualize()
+    state.set(related.get())
+    ruleActualize()
 
 def establish_button(): # Positionne le status sur established
 
-	state.set(estabish.get())
-	ruleActualize()
+    state.set(estabish.get())
+    ruleActualize()
 
 def accept_button(): # La régle iptable sera en -j ACCEPT
 
-	autorisation.set(" -j ACCEPT")
-	ruleActualize()
+    autorisation.set(" -j ACCEPT")
+    ruleActualize()
 
 def reject_button(): # La régle iptable sera en -j REJECT
 
-	autorisation.set(" -j REJECT")
-	ruleActualize()
+    autorisation.set(" -j REJECT")
+    ruleActualize()
 
 def drop_button(): # La régle iptable sera en -j DROP
 
-	autorisation.set(" -j DROP")
-	ruleActualize()
+    autorisation.set(" -j DROP")
+    ruleActualize()
 
 def trafficDirection_Button(): # La régle iptable concernera le traffic en entrée
-	
-	trafficDirection.set("INPUT ")
-	ruleActualize()
+    
+    trafficDirection.set("INPUT ")
+    ruleActualize()
 
 def output_button(): # La régle iptable concernera le traffic en sortie
-	
-	trafficDirection.set("OUTPUT ")
-	ruleActualize()
+    
+    trafficDirection.set("OUTPUT ")
+    ruleActualize()
 
 def writeIntoScript(): # Inscrit la régle iptable dans le script iptable_init.sh et appelle la fonction "writIntoOutputOrInput" de façon à la positionner au bon endroit
+    
+    ruleConcatenation = trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get()
+    
+    if ruleConcatenation != "": # Gestion de l'exception si rien n'a été renseigné dans la chaine iptable
+        rule.set("iptables -A "+ ruleConcatenation)
 
-	rule.set("iptables -A "+trafficDirection.get()+output_B.get()+interfacePrefix.get()+interface.get()+protocol_M.get()+destination.get()+port_L.get()+state.get()+autorisation.get())
-	
-	if 'INPUT' in rule.get():
+        if 'INPUT' in rule.get():
 
-	    writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_INPUT')
+                writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_INPUT')
+                tkMessageBox.showinfo("Succes", "The rule is saved in the script")
+                resetAll()
+                rule.set("")
 
-	if 'OUTPUT' in rule.get():
+        elif 'OUTPUT' in rule.get():
 
-	    writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_OUTPUT')
+                writeIntoOutputOrInput('scripts/iptable_init.sh', "\n"+rule.get(), '#table_OUTPUT')
+                tkMessageBox.showinfo("Succes", "The rule is saved in the script")
+                resetAll()
+                rule.set("")
 
-	resetAll()
-	rule.set("")
-	tkMessageBox.showinfo("Succes", "The rule is saved in the script")
+
+        else: # Gestion de l'exception si l'option INPUT ou OUTPUT est manquante
+            tkMessageBox.showerror("Error","Enter INPUT or OUTPUT") 
+    else :
+        tkMessageBox.showerror("Error","Rule is empty")
+    
+    
 
 def scriptLoad(): # Ouvre le script iptabl_init.sh de façon à pouvoir faire des modification directement
 
-	odtPrint = subprocess.Popen(["loffice","scripts/iptable_init.sh"], stdout=subprocess.PIPE)
-	output = odtPrint.communicate()[0]
-	print(output)		
+    odtPrint = subprocess.Popen(["loffice","scripts/iptable_init.sh"], stdout=subprocess.PIPE)
+    output = odtPrint.communicate()[0]
+    print(output)       
 
 
 ####################################### MAIN #######################################

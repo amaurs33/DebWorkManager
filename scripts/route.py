@@ -34,19 +34,20 @@ def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
 
 def getRoadToUser(): # Fonction qui va déployer les fichier iptable_init.sh et route_init.sh grâce à une connection SSH
 
+	
 	roadSSHCommand =  "sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'route -n'" # affiche des routes selectionné sur l'utilisateur cible
 	
 	
 	SSHConnection = subprocess.Popen([roadSSHCommand], shell = True,stdout=subprocess.PIPE) # Execution des commande dans le shell linux
 	outputSSHConnection,error = SSHConnection.communicate()
 
-	if outputSSHConnection:
+	if outputSSHConnection: # gestion de l'exception de mauvais mot de passe ou d'une machine non connectée
 		SSHpasswd.set('')
 		raodLabel.set(outputSSHConnection)
 	 	
 	else:
 		SSHpasswd.set('')
-		tkMessageBox.showerror("Error","wrong password, try again")
+		tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
 	
 def databaseCreationIpUser () : # Création de la base de donnée IP - USER
 
@@ -78,18 +79,22 @@ def listboxIntegration () : # Fonction qui va intégrer des valeurs dans la list
 	connexion.close() # Fermeture de la base de donnée
 
 def writeRoadToScript(): # Inscription de la nouvelle route dans le fichier route_init.sh
+	
+	if address.get() != "" and mask.get() != "" and gateway.get() != "" : # Gestion de l'exception si l'un des widget entry n'est pas rempli
 
-	newRoad.set("route add -net "+address.get()+" netmask "+mask.get()+" gw "+gateway.get()) # Création du string route
-	file = open('scripts/route_init.sh','a') # Ouverture puis inscription dans le fichier route_init.sh
-	file.write("\n"+newRoad.get())
-	file.close()
+		newRoad.set("route add -net "+address.get()+" netmask "+mask.get()+" gw "+gateway.get()) # Création du string route
+		file = open('scripts/route_init.sh','a') # Ouverture puis inscription dans le fichier route_init.sh
+		file.write("\n"+newRoad.get())
+		file.close()
 
-	mask.set("") # Les 4 prochaines lignes réinitialisent les variables
-	gateway.set("")
-	address.set("")
-	newRoad.set("")
+		mask.set("") # Les 4 prochaines lignes réinitialisent les variables
+		gateway.set("")
+		address.set("")
+		newRoad.set("")
 
-	tkMessageBox.showinfo("Succes", "New road is saved in the script") # Affichage de la réussite de l'enregistrement
+		tkMessageBox.showinfo("Succes", "New road is saved in the script") # Affichage de la réussite de l'enregistrement
+	else :
+		tkMessageBox.showerror("Error","All entry wdigets are not filed")
 
 def roadScriptOpening(): # Lancement du script de configuration des routes pour une modification en direct
 

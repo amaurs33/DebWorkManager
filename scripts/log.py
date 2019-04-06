@@ -40,13 +40,13 @@ def getLogToUser(): # Fonction qui va déployer les fichier iptable_init.sh et r
 	SSHConnection = subprocess.Popen([logSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
 	outputSSHConnection,error = SSHConnection.communicate()
 
-	if outputSSHConnection:
+	if outputSSHConnection: # gestion de l'exception de mauvais mot de passe ou d'une machine non connectée
 		SSHpasswd.set('')
 		displayLogInLabel.set(outputSSHConnection)
 	 	
 	else:
 		SSHpasswd.set('')
-		tkMessageBox.showerror("Error","wrong password, try again")
+		tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
 	
 	
 ########
@@ -103,15 +103,17 @@ def databaseAdd (): # Ajout d'une valeur dans la base de donnée ( chemin plus l
 
 	connexion = sqlite3.connect("dataBase/log.db") #connexion à la base de donnée
 	curseur = connexion.cursor()
-	donnees = (newLogPath.get(),logPathName.get())
-	curseur.execute('''INSERT INTO logFiles (chemin, nom ) VALUES (?,?)''',donnees)
-	connexion.commit()
-	tkMessageBox.showinfo("Succes", "The log file is saved in the database")
-	connexion.close()
-	newLogPath.set("")
-	logPathName.set("")
-	listboxIntegration()
-
+	if newLogPath.get() != "" and logPathName.get() != "" : # Gestion de l'esxception si l'un des deux widget entry n'est pas renseigné
+		donnees = (newLogPath.get(),logPathName.get())
+		curseur.execute('''INSERT INTO logFiles (chemin, nom ) VALUES (?,?)''',donnees)
+		connexion.commit()
+		tkMessageBox.showinfo("Succes", "The log file is saved in the database")
+		connexion.close()
+		newLogPath.set("")
+		logPathName.set("")
+		listboxIntegration()
+	else:
+		tkMessageBox.showerror("Error","One entry widget is empty, try again")
 
 
 def listboxIntegration () : # Intégration des valeur de la base de donnée dans la listeBox
