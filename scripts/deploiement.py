@@ -13,7 +13,7 @@ def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
 
 	def closeWindow():
 
-		SSHpasswdWindows.quit() # Fermeture de la fenêtre de mot de passe SSH
+		SSHpasswdWindows.destroy() # Fermeture de la fenêtre de mot de passe SSH
 
 	def getInputPasswd():
 
@@ -39,9 +39,16 @@ def deployment(): # Fonction qui va déployer les fichier iptable_init.sh et rou
 	updateRcSSHCommand = "&& sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'" # Mise à jours,par SSH, du rc.d afin que les scripts s'éxecutent au démarrage.
 	
 	SSHConnection = subprocess.Popen([copySSHcommand,updateRcSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
-	outputSSHConnection = SSHConnection.communicate()[0]
-	SSHpasswd.set('') # Suppression du mot de passe de connection SSH
-	tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
+	outputSSHConnection,error = SSHConnection.communicate()
+
+	if outputSSHConnection:
+		SSHpasswd.set('')
+		tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
+	 	
+	else:
+		SSHpasswd.set('')
+		tkMessageBox.showerror("Error","wrong password, try again")
+	
 
 def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données
 

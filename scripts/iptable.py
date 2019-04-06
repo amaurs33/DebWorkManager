@@ -4,8 +4,78 @@ from Tkinter import *
 import subprocess
 import tkMessageBox
 import ttk
+import sqlite3
 
 ############################################ definition des fonctions ####################################
+def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
+	
+	def closeWindow():
+
+		SSHpasswdWindows.destroy() # Fermeture de la fenêtre de mot de passe SSH
+
+	def getInputPasswd():
+
+		SSHpasswd.set(readInputSSHPasswd.get()) # On associe la valeur entrée au stringVar SSHpasswd
+		closeWindow()
+		getIptableRuleToUser() # Appelle de la méthode d'affichage des logs
+	
+	SSHpasswdWindows = Toplevel(iptable_window) # Composition graphique de la fenêtre
+
+	SSHpasswdWindows.title("ssh connection authentification")
+	SSHpasswdWindows.lift(aboveThis=iptable_window)
+	labelSSHPasswd = Label(SSHpasswdWindows,text="Enter SSH password please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
+	labelSSHPasswd.grid(row=0,column=0)
+	entrySSHPasswd = Entry(SSHpasswdWindows, bd=5, width=20, show="*",textvariable=readInputSSHPasswd)
+	entrySSHPasswd.grid(row=1,column=0)
+	saveButton=Button(SSHpasswdWindows,command=getInputPasswd, text="Accept", fg="white", bg="#c90000",font='Helvetica 14 bold') # Le bouton enregistré appelle la fonction getInputPasswd qui associe le mot de passe saisi au stringVar SSHpasswd
+	saveButton.grid(row=2,column=0)
+
+
+def getIptableRuleToUser(): # Fonction qui va déployer les fichier iptable_init.sh et route_init.sh grâce à une connection SSH
+
+	iptableSSHCommand =  "sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'sudo iptables -L -n'" # commande qui affiche les régles iptables distantes
+	
+	
+	SSHConnection = subprocess.Popen([iptableSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
+	outputSSHConnection,error = SSHConnection.communicate()
+
+	if outputSSHConnection:
+		SSHpasswd.set('')
+		iptableResult.set(outputSSHConnection)
+	 	
+	else:
+		SSHpasswd.set('')
+		tkMessageBox.showerror("Error","wrong password, try again")
+
+
+def databaseCreationIpUser () : # Création de la base de donnée IP - USER
+
+	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+	curseur = connexion.cursor()
+	curseur.execute('''CREATE TABLE IF NOT EXISTS ip_ssh (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, IP TEXT, USER TEXT)''') # création de la table logFiles
+	connexion.close() # Fermeture de la connection
+
+def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données
+
+	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+	curseur = connexion.cursor()
+	getUserInListbox = listboxUserToIp.get(listboxUserToIp.curselection())
+	curseur.execute("SELECT IP FROM ip_ssh WHERE USER LIKE '%s'" % getUserInListbox) # Récupération de l'IP suivant l'utilisateur selectionné dans la listbox
+	record = curseur.fetchone()
+	IpSelected.set(record[0]) 
+	connexion.close() # Fermeture de la connexion SSH
+	getSSHPasswd() # Appelle de la fonction getSSHPasswd afin de pouvoir authentifier la connection SSH
+
+def listboxIntegration () : # Fonction qui va intégrer des valeurs dans la listBox
+
+	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+	curseur = connexion.cursor()
+	curseur.execute("SELECT USER FROM ip_ssh") # Récupération des valeurs "nom" dans la base de donnée pour l'insérer dans la listeBox
+	i=0
+	for row in curseur.fetchall():
+		listboxUserToIp.insert(i,row[0])
+		i=i+1
+	connexion.close() # Fermeture de la base de donnée
 
 def writeIntoOutputOrInput(filename,string,tag): # fonction qui va inscrire la régle iptables dans la table INPUT ou OUTPUT en fonction de la régle indiquée
 
@@ -139,46 +209,7 @@ def scriptLoad(): # Ouvre le script iptabl_init.sh de façon à pouvoir faire de
 	output = odtPrint.communicate()[0]
 	print(output)		
 
-def sudo():	# Fenêtre permettant l'authentification afin d'afficher les régles iptables
 
-	def closeWindow():
-
-		sudoWindow.destroy()
-
-	def variable():
-
-		sudo_password.set(saisie.get())
-		displayIptableRules() # affiche les régles iptable
-		closeWindow()
-	
-	sudoWindow = Toplevel(iptable_window)
-	sudoWindow.title("root authentification")
-	sudoWindow.lift(aboveThis=iptable_window)
-	emptyLabel2 = Label(sudoWindow,text="Enter the root password, please :" ,font='Helvetica 14 bold') # Ces deux lignes permettent juste d'espacer les boutons
-	emptyLabel2.grid(row=0,column=0)
-	entryPasswd = Entry(sudoWindow, bd=5, width=20, show="*",textvariable=saisie)
-	entryPasswd.grid(row=1,column=0)
-	saveButton=Button(sudoWindow,command=variable, text="Accepter", fg="white", bg="#c90000",font='Helvetica 14 bold')
-	saveButton.grid(row=2,column=0)
-
-def displayIptableRules(): # affiche les régles iptables du PC cible
-	
-	command = "sudo iptables -L -n"
-	command = command.split()
-	
-	cmd1 = subprocess.Popen(['echo',sudo_password.get()], stdout=subprocess.PIPE)
-	cmd2 = subprocess.Popen(['sudo','-S'] + command, stdin=cmd1.stdout, stdout=subprocess.PIPE)
-	output,error = cmd2.communicate()
-	#output,error = cmd2.communicate() # Le paragraphe (if else) permet d'afficher des messagesBox en cas de bon ou mauvais mot de passe
-
-	if output:
-		sudo_password.set("")
-		iptableResult.set(output)
-	 	
-	else:
-		sudo_password.set("")
-		tkMessageBox.showerror("Error","wrong password, try again")
-		
 ####################################### MAIN #######################################
 
 ### mise en forme de la fenêtre principale ###
@@ -232,6 +263,14 @@ destination.set("")
 interfacePrefix = StringVar()
 interfacePrefix.set("")
 
+ipAddress = StringVar() # Variable "adresse IP"
+ipAddress.set('')
+userName = StringVar() # Variable "nom d'utilisateur"
+userName.set('')
+readInputSSHPasswd = StringVar() # Variable d'entrée de mot de passe dans la textbox
+SSHpasswd = StringVar() # Variable de mot de passe SSH
+IpSelected = StringVar() # Variable de l'IP selectionnée dans la listbox par rapport à l'utilisateur
+IpSelected.set('')
 ##################################### création des boutons,label etc... ###############################
 ##################################### partie supérieur frame_up #######################################
 
@@ -353,6 +392,7 @@ entryRule.place(x=75,y=38)
 
 ##################################### partie inférieure frame_down #######################################
 
+
 labelDown = Label(frame_down,textvariable= iptableResult)
 labelDown.place(x=150,y=10)
 labelDown.configure(foreground="white",bg='#000000')
@@ -364,7 +404,16 @@ fichierImg = PhotoImage(file="pictures/fichier.gif")
 buttonFichier.config(image=fichierImg)
 buttonFichier.image = fichierImg
 
-actualizeButton=Button(frame_down, text="Actualize", foreground = "black", command=sudo)
+labelName = Label(frame_down, text="Select one user :", foreground='black',bg='#dad6d5')
+labelName.place(x=602,y=0)
+
+listboxUserToIp = Listbox(frame_down, height =2) # création de la listbox pour choisir vers quelle adresse IP/USER la connexion SSH doit être effectuée 
+listboxUserToIp.place(x=720,y=0)
+
+databaseCreationIpUser()
+listboxIntegration ()
+
+actualizeButton=Button(frame_down, text="Actualize", foreground = "black", command=getIpInDatabase)
 actualizeButton.place(x=890,y=0)
 
 iptable_window.mainloop()
