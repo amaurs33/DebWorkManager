@@ -70,17 +70,21 @@ def databaseCreationIpUser () : # Création de la base de donnée IP - USER
 
 def databaseAdd (): # Ajout de données dans la base de donnée IP - USER
 	
+	if ipAddress.get() != "" and userName.get() != "" : # Gestion de l'exception si l'un des widget entry n'est pas rempli
 
-	connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
-	curseur = connexion.cursor()
-	entriesIpUser = (ipAddress.get(),userName.get()) # Récupération des valeurs entrées dans les textBox : IP et USER
-	curseur.execute('''INSERT INTO ip_ssh (IP, USER ) VALUES (?,?)''',entriesIpUser) # Insertion dans la base de donnée
-	connexion.commit() # Fermeture de la connection
-	tkMessageBox.showinfo("Success", "add to database")
-	connexion.close() # Fermeture de la connection
-	ipAddress.set("") # Réinitialisation de l'adresse IP
-	userName.set("") # Réinitialisation du nom de l'utilisateur
-	listboxIntegration() # Fonction qui va intégrer les nouvelles valeurs dans la listbox
+		connexion = sqlite3.connect("dataBase/ip_ssh.db") #connexion à la base de donnée
+		curseur = connexion.cursor()
+		entriesIpUser = (ipAddress.get(),userName.get()) # Récupération des valeurs entrées dans les textBox : IP et USER
+		curseur.execute('''INSERT INTO ip_ssh (IP, USER ) VALUES (?,?)''',entriesIpUser) # Insertion dans la base de donnée
+		connexion.commit() # Fermeture de la connection
+		tkMessageBox.showinfo("Success", "add to database")
+		connexion.close() # Fermeture de la connection
+		ipAddress.set("") # Réinitialisation de l'adresse IP
+		userName.set("") # Réinitialisation du nom de l'utilisateur
+		listboxIntegration() # Fonction qui va intégrer les nouvelles valeurs dans la listbox
+		
+	else :
+		tkMessageBox.showerror("Error","All entry wdigets are not filed")
 
 
 def listboxIntegration () : # Fonction qui va intégrer des valeurs dans la listBox
