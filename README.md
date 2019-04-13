@@ -41,7 +41,7 @@ côté client :
 
 Comment ça marche ???
 
-    • Afin de vous apporter une aide pour utiliser se programme ou en comprendre le fonctionnement, j’ai réalisé une documentation technique que vous trouverez en lançant DebWorkManager puis en cliquand sur l’onglet « aide »
+    • Afin de vous apporter une aide pour utiliser se programme ou en comprendre le fonctionnement, j’ai réalisé une documentation technique que vous trouverez en lançant DebWorkManager puis en cliquant sur l’onglet « aide »
 
 
 

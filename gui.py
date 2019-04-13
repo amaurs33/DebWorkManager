@@ -31,7 +31,7 @@ def helpLoad():
 
 	lofficeCommandLine = subprocess.Popen(["loffice","aide.odt"], stdout=subprocess.PIPE)
 	output = lofficeCommandLine.communicate()[0]
-	
+
 ################################################ MAIN ###################################################
 	
 window = Tk() # Les lignes suivantes définissent l'interface graphique de la fenêtre principale
