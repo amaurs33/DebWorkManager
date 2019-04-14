@@ -43,5 +43,11 @@ Comment ça marche ???
 
     • Afin de vous apporter une aide pour utiliser se programme ou en comprendre le fonctionnement, j’ai réalisé une documentation technique que vous trouverez en lançant DebWorkManager puis en cliquant sur l’onglet « aide »
 
+Logiciel testé et fonctionnel sur :
+
+- Coté serveur : Linux version 4.15.0-47-generic ( ubuntu ),
+- Coté client : Linux version 4.15.0-47-generic ( antiX linux ).
+
+
 
 
