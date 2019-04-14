@@ -35,7 +35,7 @@ def helpLoad():
 ################################################ MAIN ###################################################
 	
 window = Tk() # Les lignes suivantes définissent l'interface graphique de la fenêtre principale
-window.title("Grub") 
+window.title("DebWorkManager") 
 window.geometry("465x220") 
 window.configure(bg='#000000') 
 window.resizable(width=False,height=False) 
