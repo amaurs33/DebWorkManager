@@ -44,6 +44,7 @@ iptables -t mangle -P POSTROUTING ACCEPT
 
 
 #table_INPUT
+iptables -A INPUT -i  -p udp --dport 53 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 
 #table_OUTPUT
