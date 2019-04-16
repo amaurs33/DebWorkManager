@@ -1,4 +1,4 @@
-﻿#!/bin/sh -e
+﻿#!/bin/sh  -e
 ### BEGIN INIT INFO
 # Provides: firewall rules
 # Required-Start: $remote_fs $syslog
@@ -9,52 +9,17 @@
 # Description: Enable service provided by daemon.
 ### END INIT INFO
 
-###################### Chargement des modules nécessaires ################################
 
-modprobe iptable_nat
-modprobe ip_contrack
-
-###################### initialisation de la table Filter #################################
-# je refuse tout par défaut !!!
-
-iptables -t filter -F
-iptables -t filter -X
-iptables -t filter -P INPUT DROP
-iptables -t filter -P FORWARD DROP
-iptables -t filter -P OUTPUT DROP
-
-##################### initialisation de la table NAT #####################################
-
-iptables -t nat -F
-iptables -t nat -X
-iptables -t nat     -P PREROUTING ACCEPT
-iptables -t nat     -P POSTROUTING ACCEPT
-iptables -t nat     -P OUTPUT ACCEPT
-
-##################### initialisation de la table MANGLE ##################################
-
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -t mangle -P PREROUTING ACCEPT
-iptables -t mangle -P INPUT ACCEPT
-iptables -t mangle -P OUTPUT ACCEPT
-iptables -t mangle -P FORWARD ACCEPT
-iptables -t mangle -P POSTROUTING ACCEPT
 
 
 
 #table_INPUT
-iptables -A INPUT -i  -p udp --dport 53 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
 
 
 #table_OUTPUT
+iptables -A OUTPUT -o eth0 -p udp --sport 53 -m state --state RELATED,ESTABLISHED -j REJECT
 
 
-########################################### LOG du traffic ###########################################
 
-iptables -t filter -A OUTPUT -j LOG --log-prefix="netfilter_[ OUTPUT ]"
-iptables -t filter -A INPUT -j LOG --log-prefix="netfilter_[ INPUT ]"
-iptables -t filter -A FORWARD -j LOG --log-prefix="netfilter_[ FORWARD ]"
-iptables -t filter -A POSTROUTING -j LOG --log-prefix="netfilter_[ POSTROUTING ]"
-iptables -t filter -A PREROUTING -j LOG --log-prefix="netfilter_[ PREROUTING ]"
-iptables -t filter -A MANGLE -j LOG --log-prefix="netfilter_[ MANGLE ]"
+

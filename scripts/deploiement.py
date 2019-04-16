@@ -35,20 +35,23 @@ def getSSHPasswd():	# Fenêtre permettant de se connecter en super-utilisateur
 
 def deployment(): # Fonction qui va déployer les fichier iptable_init.sh et route_init.sh grâce à une connection SSH
 
+	def updateRc():
+		updateRcSSHCommand = "sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'" # Mise à jours,par SSH, du rc.d afin que les scripts s'éxecutent au démarrage.
+		SSHConnectionRc = subprocess.Popen([updateRcSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
+		outputSSHUpdateRc = SSHConnectionRc.communicate()
 	copySSHcommand =  "sshpass -p "+ SSHpasswd.get() +" scp -r scripts/iptable_init.sh root@"+IpSelected.get()+":/etc/init.d/ && sshpass -p "+SSHpasswd.get()+" scp -r scripts/route_init.sh root@"+IpSelected.get()+":/etc/init.d/ " # copie des scripts vers l'ordinateur cible par SSH
-	updateRcSSHCommand = "&& sshpass -p "+SSHpasswd.get()+" ssh root@"+IpSelected.get()+" 'update-rc.d iptable_init.sh defaults && update-rc.d route_init.sh defaults'" # Mise à jours,par SSH, du rc.d afin que les scripts s'éxecutent au démarrage.
-	
-	SSHConnection = subprocess.Popen([copySSHcommand,updateRcSSHCommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
+	SSHConnection = subprocess.Popen([copySSHcommand],shell=True, stdout=subprocess.PIPE) # Execution des commande dans le shell linux
 	outputSSHConnection,error = SSHConnection.communicate()
+	updateRc()
 
 	if outputSSHConnection: # gestion de l'exception de mauvais mot de passe ou d'une machine non connectée
 		SSHpasswd.set('')
-		tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
+		tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
 	 	
 	else:
+		
 		SSHpasswd.set('')
-		tkMessageBox.showerror("Error","wrong password or host isn't connected, try again")
-	
+		tkMessageBox.showinfo("Success", "Completed deployment") # Message d'information sur la réussite du déploiement
 
 def getIpInDatabase() : # Récupération de l'ip suivant l'utilisateur choisi dans la base de données
 
